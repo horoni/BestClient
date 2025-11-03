@@ -11,13 +11,17 @@ void FAimbot::Aimbot()
 	
 	//HookVisible(m_TargetPos);
 	if(Controls()->m_aInputData[LOCAL].m_Hook == 1)
+	{
 		GetClosestHitpoint(TOOL::Hook);
 		Aim(NormalizeAim(m_TargetPos));
+	}
 	else if (Controls()->m_aInputData[LOCAL].m_Fire == 1)
+	{
 		fHelper->dbg_msg("bot", "bot: fire before = %d", Controls()->m_aInputData[LOCAL].m_Fire)
 		GetClosestHitpoint(TOOL::Laser);
 		Aim(NormalizeAim(m_TargetPos));
 		fHelper->dbg_msg("bot", "bot: fire after = %d", Controls()->m_aInputData[LOCAL].m_Fire);
+	}
 	else
 		m_CanAim = true;
 }
