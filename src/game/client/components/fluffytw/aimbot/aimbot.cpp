@@ -64,10 +64,14 @@ void FAimbot::HookVisible(vec2 targetPos)
 // Gets
 void FAimbot::GetClosestHitpoint(TOOL tool)
 {
-	if (tool == TOOL::Hook)
-		m_TargetId = GetClosestId(g_Config.m_ClAimbotFov);
-	else if (tool == TOOL::Laser)
-		m_TargetId = GetClosestId(g_Config.m_ClAimbotFov, 815.f);
+	switch(tool) {
+		case TOOL::Hook:
+			m_TargetId = GetClosestId(g_Config.m_ClAimbotFov);
+			break;
+		case TOOL::Laser:
+			m_TargetId = GetClosestId(g_Config.m_ClAimbotFov, 815.f);
+			break;
+	}
 
 	if(!fHelper->IsValidId(m_TargetId))
 	{
@@ -147,10 +151,14 @@ bool FAimbot::PredictTool(TOOL tool, vec2 &myPos, vec2 myVel, vec2 &targetPos, v
 	const vec2 deltaVel = targetVel - myVel;
 
 	float toolFireSpeed;
-	if (tool == TOOL::Hook)
-		toolFireSpeed = Tuning()->m_HookFireSpeed;
-	else if (tool == TOOL::Laser)
-		toolFireSpeed = Tuning()->m_ShotgunSpeed;
+	switch(tool) {
+		case TOOL::Hook:
+			toolFireSpeed = Tuning()->m_HookFireSpeed;
+			break;
+		case TOOL::Laser:
+			toolFireSpeed = Tuning()->m_ShotgunSpeed;
+			break;
+	}
 
 	const float toolSpeed = length(targetVel) + toolFireSpeed;
 	const float a = dot(deltaVel, deltaVel) - powf(toolSpeed, 2);
@@ -175,15 +183,16 @@ bool FAimbot::HitScanTool(TOOL tool, vec2 initPos, vec2 targetPos, vec2 scanDir)
 	float toolFireSpeed;
 	float toolLength;
 
-	if (tool == TOOL::Hook)
-		toolFireSpeed = Tuning()->m_HookFireSpeed;
-	else if (tool == TOOL::Laser)
-		toolFireSpeed = Tuning()->m_ShotgunSpeed;
-
-	if (tool == TOOL::Hook)
-		toolLength = Tuning()->m_HookLength;
-	else if (tool == TOOL::Laser)
-		toolLength = Tuning()->m_LaserReach;
+	switch(tool) {
+		case TOOL::Hook:
+			toolFireSpeed = Tuning()->m_HookFireSpeed;
+			toolLength = Tuning()->m_HookLength;
+			break;
+		case TOOL::Laser:
+			toolFireSpeed = Tuning()->m_ShotgunSpeed;
+			toolLength = Tuning()->m_LaserReach;
+			break;
+	}
 
 	vec2 exDirection = normalize(scanDir);
 	vec2 finishPos = initPos + exDirection * (toolLength - PHYS_SIZE * 1.5f);
