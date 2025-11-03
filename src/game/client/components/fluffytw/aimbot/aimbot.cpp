@@ -17,7 +17,7 @@ void FAimbot::Aimbot()
 	}
 	else if (Controls()->m_aInputData[LOCAL].m_Fire == 1)
 	{
-		fHelper->dbg_msg("bot", "bot: fire before = %d", Controls()->m_aInputData[LOCAL].m_Fire)
+		fHelper->dbg_msg("bot", "bot: fire before = %d", Controls()->m_aInputData[LOCAL].m_Fire);
 		GetClosestHitpoint(TOOL::Laser);
 		Aim(NormalizeAim(m_TargetPos));
 		fHelper->dbg_msg("bot", "bot: fire after = %d", Controls()->m_aInputData[LOCAL].m_Fire);
