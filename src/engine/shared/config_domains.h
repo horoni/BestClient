@@ -6,6 +6,7 @@
 #endif
 
 CONFIG_DOMAIN(DDNET, "settings_ddnet.cfg", true)
+CONFIG_DOMAIN(SHIKON, "settings_shikon.cfg", true)
 CONFIG_DOMAIN(TCLIENT, "settings_tclient.cfg", true)
 CONFIG_DOMAIN(BESTCLIENT, "settings_BestClient.cfg", true)
 CONFIG_DOMAIN(HUDLAYOUT, "BestClient/hud_layout.cfg", false)

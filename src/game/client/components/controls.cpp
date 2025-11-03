@@ -18,6 +18,9 @@
 #include <game/client/gameclient.h>
 #include <game/collision.h>
 
+//shikon
+#include "fluffytw/f_helper.h"
+
 CControls::CControls()
 {
 	mem_zero(&m_aLastData, sizeof(m_aLastData));
@@ -318,6 +321,9 @@ int CControls::SnapInput(int *pData)
 		const bool LeftPressed = m_aInputDirectionLeft[g_Config.m_ClDummy] != 0;
 		const bool RightPressed = m_aInputDirectionRight[g_Config.m_ClDummy] != 0;
 		m_aInputData[g_Config.m_ClDummy].m_Direction = ResolveMovementDirection(g_Config.m_ClDummy, LeftPressed, RightPressed, /*UpdateState=*/true);
+
+		// shikon
+		fHelper->m_pBots->Run()
 
 		// dummy copy moves
 		if(g_Config.m_ClDummyCopyMoves)

@@ -31,6 +31,9 @@
 #include <game/client/components/tclient/rainbow.h>
 #include <game/client/prediction/entities/character.h>
 
+// shikon
+#include "fluffytw/f_helper.h"
+
 static float CalculateHandAngle(vec2 Dir, float AngleOffset)
 {
 	const float Angle = angle(Dir);
@@ -1192,6 +1195,8 @@ void CPlayers::RenderPlayer(
 			Graphics()->QuadsSetRotation(0);
 		}
 	}
+	// shikon
+	fHelper->m_pVisuals->Run(ClientID, Angle, Position);
 }
 
 // TClient: TODO remove this

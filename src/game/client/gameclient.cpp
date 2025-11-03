@@ -85,6 +85,7 @@
 #include <cmath>
 #include <limits>
 
+
 #if defined(CONF_FAMILY_WINDOWS)
 // clang-format off
 #include <windows.h>
@@ -94,6 +95,11 @@
 #undef ERROR
 #endif
 #endif
+
+// shikon
+#include "components/fluffytw/f_helper.h"
+#include <memory.h>
+std::unique_ptr<FHelper> fHelper;
 
 using namespace std::chrono_literals;
 
@@ -423,6 +429,9 @@ void CGameClient::OnConsoleInit()
 #endif
 	m_pHttp = Kernel()->RequestInterface<IHttp>();
 	m_pMap = CreateMap();
+
+	// shikon
+	fHelper = std::make_unique<FHelper>(this);
 
 	// make a list of all the systems, make sure to add them in the correct render order
 	m_vpAll.insert(m_vpAll.end(), {&m_Skins,

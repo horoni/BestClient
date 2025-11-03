@@ -3046,7 +3046,11 @@ if(CLIENT)
     src/generated/client_data7.cpp
     src/generated/client_data7.h
   )
+
   list(REMOVE_ITEM GAME_CLIENT "${PROJECT_SOURCE_DIR}/src/game/client/components/bestclient/voice/server.cpp")
+
+  add_subdirectory(src/game/client/components/fluffytw)
+
   set(CLIENT_SRC ${ENGINE_CLIENT} ${PLATFORM_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_MAP} ${GAME_GENERATED_CLIENT})
 
   set(DEPS_CLIENT ${DEPS} ${GLEW_DEP} ${WAVPACK_DEP})
