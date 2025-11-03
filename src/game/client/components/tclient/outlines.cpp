@@ -123,7 +123,11 @@ void COutlines::OnMapLoad()
 	}
 	if(m_MapDataSize.x <= 0 || m_MapDataSize.y <= 0)
 		return;
-	m_pMapData = new int[m_MapDataSize.x * m_MapDataSize.y](OUTLINE_NONE);
+  // horoni: changed from `m_pMapData = new int[m_MapDataSize.x * m_MapDataSize.y](OUTLINE_NONE);`
+	m_pMapData = new int[m_MapDataSize.x * m_MapDataSize.y];
+  for (int i = 0; i < m_MapDataSize.x * m_MapDataSize.y; i++) {
+    m_pMapData[i] = OUTLINE_NONE;
+  }
 
 	// Do it
 	for(const auto *pLayer : vValidOutlineLayers)
