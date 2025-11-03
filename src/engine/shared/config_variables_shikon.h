@@ -8,6 +8,7 @@
 #define MACRO_CONFIG_STR(Name, ScriptName, Len, Def, Save, Desc)
 #endif
 
+MACRO_CONFIG_INT(ClShikonDbg, sh_dbg, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Sh Debug")
 MACRO_CONFIG_INT(ClEspEnable, sh_esp, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Esp enable")
 MACRO_CONFIG_INT(ClEspFov, sh_esp_fov, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draw FOV")
 MACRO_CONFIG_INT(ClAimbotEnable, sh_aimbot, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Aimbot enable")
