@@ -2,10 +2,9 @@
 
 #include <memory>
 
-#include <game/client/fluffytw/f_bots.h>
-#include <game/client/fluffytw/aimbot/aimbot.h>
-#include <game/client/fluffytw/f_visuals.h>
-#include <game/client/fluffytw/f_config.h>
+#include <game/client/components/fluffytw/f_bots.h>
+#include <game/client/components/fluffytw/aimbot/aimbot.h>
+#include <game/client/components/fluffytw/f_visuals.h>
 
 #include "base/logger.h"
 

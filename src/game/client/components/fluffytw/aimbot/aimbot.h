@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/client/fluffytw/f_component.h"
+#include "game/client/components/fluffytw/f_component.h"
 #include <game/client/gameclient.h>
 
 class FAimbot : public FComponent

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <game/client/gameclient.h>
-#include "game/client/fluffytw/f_config.h"
-#include "game/client/fluffytw/f_component.h"
+#include "game/client/components/fluffytw/f_component.h"
 
 class FVisuals : public FComponent
 {

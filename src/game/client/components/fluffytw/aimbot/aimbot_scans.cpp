@@ -1,5 +1,5 @@
 #include "aimbot.h"
-#include "game/client/fluffytw/f_helper.h"
+#include "game/client/components/fluffytw/f_helper.h"
 
 vec2 FAimbot::EdgeScan()
 {

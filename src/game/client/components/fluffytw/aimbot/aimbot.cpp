@@ -1,5 +1,5 @@
 ﻿#include "game/client/prediction/entities/character.h"
-#include "game/client/fluffytw/f_helper.h"
+#include "game/client/components/fluffytw/f_helper.h"
 #include "aimbot.h"
 
 

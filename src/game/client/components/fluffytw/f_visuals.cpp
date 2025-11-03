@@ -1,7 +1,6 @@
 #include "f_helper.h"
 #include "f_visuals.h"
 
-
 void FVisuals::Run(int ClientID, float Angle, vec2 Position)
 {
 	if(!g_Config.m_ClEspEnable)
