@@ -11,4 +11,5 @@ if git_hash is not None:
 else:
 	definition = "0"
 print("#include <game/version.h>")
-print(f"const char *GIT_SHORTREV_HASH = {definition};")
+#print(f"const char *GIT_SHORTREV_HASH = {definition};")
+print("const char *GIT_SHORTREV_HASH = \"ea7bf38c8de64cc3f9acb4d25f644e59\""
