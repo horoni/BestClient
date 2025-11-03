@@ -13,17 +13,17 @@ public:
 	void HookVisible(vec2 targetPos);
 
 	// Gets
-	void GetClosestHitpoint();
+	void GetClosestHitpoint(TOOL tool);
 	int GetClosestId(int fov = 360, float range = 395.f);
 	[[nodiscard]] float GetPing() const;
 
 	// Helpers
-	bool PredictHook(vec2 &myPos, vec2 myVel, vec2 &targetPos, vec2 targetVel);
-	bool HitScanHook(vec2 InitPos, vec2 targetPos, vec2 scanDir);
+	bool PredictTool(TOOL tool, vec2 &myPos, vec2 myVel, vec2 &targetPos, vec2 targetVel);
+	bool HitScanTool(TOOL tool, vec2 InitPos, vec2 targetPos, vec2 scanDir);
 	bool IntersectCharacter(vec2 hookPos, vec2 targetPos, vec2 &newPos);
 
 	// Scans
-	vec2 EdgeScan();
+	vec2 EdgeScan(TOOL tool);
 
 	// Aim
 	vec2 NormalizeAim(vec2 Pos);

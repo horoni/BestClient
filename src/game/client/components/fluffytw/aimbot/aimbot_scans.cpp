@@ -1,7 +1,7 @@
 #include "aimbot.h"
 #include "game/client/components/fluffytw/f_helper.h"
 
-vec2 FAimbot::EdgeScan()
+vec2 FAimbot::EdgeScan(TOOL tool)
 {
 	int hitPointsCount = 0;
 	vec2 hitPoints[MAX_HITPOINTS];
@@ -12,11 +12,11 @@ vec2 FAimbot::EdgeScan()
 	m_TargetVisible = false;
 
 	// Predict hook and return, if it's impossible
-	if(!PredictHook(myPos, m_MyVel, targetPos, m_TargetVel))
+	if(!PredictTool(tool, myPos, m_MyVel, targetPos, m_TargetVel))
 		return vec2(0, 0);
 
 	// If player is hookable right away, return the position
-	if(HitScanHook(myPos, targetPos, targetPos - myPos))
+	if(HitScanTool(tool, myPos, targetPos, targetPos - myPos))
 	{
 		m_TargetVisible = true;
 		return targetPos - myPos;
@@ -51,7 +51,7 @@ vec2 FAimbot::EdgeScan()
 
 		// Check if hitpoint is hookable and if it is
 		// append it to `hitPoints` and increase `hitPointsCount`
-		if(HitScanHook(myPos, targetPos, dir))
+		if(HitScanTool(tool, myPos, targetPos, dir))
 		{
 			hitPoints[hitPointsCount] = dir;
 			hitPointsCount++;

@@ -2,6 +2,10 @@
 #include "game/client/components/fluffytw/f_helper.h"
 #include "aimbot.h"
 
+enum class TOOL {
+	Hook,
+	Laser,
+};
 
 void FAimbot::Aimbot()
 {
@@ -9,10 +13,16 @@ void FAimbot::Aimbot()
 		return;
 
 	// Get closest hook point into `m_TargetPos`
-	GetClosestHitpoint();
-	HookVisible(m_TargetPos);
+	
+	//HookVisible(m_TargetPos);
 	if(Controls()->m_aInputData[LOCAL].m_Hook == 1)
+		GetClosestHitpoint(TOOL::Hook);
 		Aim(NormalizeAim(m_TargetPos));
+	else if (Controls()->m_aInputData[LOCAL].m_Fire == 1)
+		fHelper->dbg_msg("bot", "bot: fire before = %d", Controls()->m_aInputData[LOCAL].m_Fire)
+		GetClosestHitpoint(TOOL::Laser);
+		Aim(NormalizeAim(m_TargetPos));
+		fHelper->dbg_msg("bot", "bot: fire after = %d", Controls()->m_aInputData[LOCAL].m_Fire);
 	else
 		m_CanAim = true;
 }
@@ -53,9 +63,13 @@ void FAimbot::HookVisible(vec2 targetPos)
 
 
 // Gets
-void FAimbot::GetClosestHitpoint()
+void FAimbot::GetClosestHitpoint(TOOL tool)
 {
-	m_TargetId = GetClosestId(g_Config.m_ClAimbotFov);
+	if (tool == TOOL::Hook)
+		m_TargetId = GetClosestId(g_Config.m_ClAimbotFov);
+	else if (tool == TOOL::Laser)
+		m_TargetId = GetClosestId(g_Config.m_ClAimbotFov, 815.f);
+
 	if(!fHelper->IsValidId(m_TargetId))
 	{
 		m_TargetPos = vec2(0.f, 0.f);
@@ -69,7 +83,7 @@ void FAimbot::GetClosestHitpoint()
 	m_MyVel = m_pClient->m_PredictedChar.m_Vel;
 	m_TargetPos = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Pos;
 	m_TargetVel = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Vel;
-	m_TargetPos = EdgeScan();
+	m_TargetPos = EdgeScan(tool);
 }
 
 int FAimbot::GetClosestId(int fov, float range)
@@ -126,13 +140,20 @@ float FAimbot::GetPing() const
 }
 
 
-// Helpers
-bool FAimbot::PredictHook(vec2 &myPos, vec2 myVel, vec2 &targetPos, vec2 targetVel)
+// <><><> Helpers <><><><><>
+
+bool FAimbot::PredictTool(TOOL tool, vec2 &myPos, vec2 myVel, vec2 &targetPos, vec2 targetVel)
 {
 	const vec2 delta = targetPos - myPos;
 	const vec2 deltaVel = targetVel - myVel;
 
-	const float hookSpeed = length(targetVel) + Tuning()->m_HookFireSpeed;
+	float toolFireSpeed;
+	if (tool == TOOL::Hook)
+		toolFireSpeed = Tuning()->m_HookFireSpeed;
+	else if (tool == TOOL::Laser)
+		toolFireSpeed = Tuning()->m_ShotgunSpeed;
+
+	const float toolSpeed = length(targetVel) + toolFireSpeed;
 	const float a = dot(deltaVel, deltaVel) - powf(hookSpeed, 2);
 	const float b = 2.f * dot(deltaVel, delta);
 	const float c = dot(delta, delta);
@@ -149,10 +170,24 @@ bool FAimbot::PredictHook(vec2 &myPos, vec2 myVel, vec2 &targetPos, vec2 targetV
 	return false;
 }
 
-bool FAimbot::HitScanHook(vec2 initPos, vec2 targetPos, vec2 scanDir)
+
+bool FAimbot::HitScanTool(TOOL tool, vec2 initPos, vec2 targetPos, vec2 scanDir)
 {
+	float toolFireSpeed;
+	float toolLength;
+
+	if (tool == TOOL::Hook)
+		toolFireSpeed = Tuning()->m_HookFireSpeed;
+	else if (tool == TOOL::Laser)
+		toolFireSpeed = Tuning()->m_ShotgunSpeed;
+
+	if (tool == TOOL::Hook)
+		toolLength = Tuning()->m_HookLength;
+	else if (tool == TOOL::Laser)
+		toolLength = Tuning()->m_LaserReach;
+
 	vec2 exDirection = normalize(scanDir);
-	vec2 finishPos = initPos + exDirection * (Tuning()->m_HookLength - PHYS_SIZE * 1.5f);
+	vec2 finishPos = initPos + exDirection * (toolLength - PHYS_SIZE * 1.5f);
 
 	vec2 oldPos = initPos + exDirection * PHYS_SIZE * 1.5f;
 	vec2 newPos = oldPos;
@@ -162,11 +197,11 @@ bool FAimbot::HitScanHook(vec2 initPos, vec2 targetPos, vec2 scanDir)
 	do
 	{
 		oldPos = newPos;
-		newPos = oldPos + exDirection * Tuning()->m_HookFireSpeed;
+		newPos = oldPos + exDirection * toolFireSpeed;
 
-		if(distance(initPos, newPos) > Tuning()->m_HookLength)
+		if(distance(initPos, newPos) > toolLength)
 		{
-			newPos = initPos + normalize(newPos - initPos) * Tuning()->m_HookLength;
+			newPos = initPos + normalize(newPos - initPos) * toolLength;
 			DoBreak = true;
 		}
 
