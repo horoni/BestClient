@@ -4,8 +4,12 @@
 #include <game/client/gameclient.h>
 
 enum class TOOL {
-	Hook,
-	Laser,
+	Hook = 0,
+	Hammer = 1,
+	Gun = 2,
+	Shotgun = 3,
+	Grenade = 4,
+	Laser = 5,
 };
 
 class FAimbot : public FComponent
