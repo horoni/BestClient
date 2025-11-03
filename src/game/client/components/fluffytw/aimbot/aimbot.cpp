@@ -17,10 +17,11 @@ void FAimbot::Aimbot()
 	}
 	else if (Controls()->m_aInputData[LOCAL].m_Fire % 2 == 1)
 	{
+		TOOL selTool = (TOOL)(Controls()->m_aInputData[LOCAL].m_WantedWeapon);
 		if (g_Config.m_ClShikonDbg)
 			fHelper->dbg_msg("bot", "bot: fire = %d", Controls()->m_aInputData[LOCAL].m_Fire);
-		if (Controls()->m_aInputData[LOCAL].m_WantedWeapon == TOOL::Laser)
-			GetClosestHitpoint(TOOL::Laser);
+		if (selTool == TOOL::Laser)
+			GetClosestHitpoint(selTool);
 		Aim(NormalizeAim(m_TargetPos));
 	}
 	else
