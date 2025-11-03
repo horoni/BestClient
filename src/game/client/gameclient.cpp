@@ -711,7 +711,7 @@ void CGameClient::OnInit()
 	m_RenderMap.Init(Graphics(), TextRender());
 
 	// shikon
-	str_format(m_aDDNetVersionStr, sizeof(m_aDDNetVersionStr), "TClient 19.5 (ea7bf38c8de64cc3f9acb4d25f644e59)");
+	str_format(m_aDDNetVersionStr, sizeof(m_aDDNetVersionStr), "%s 19.5 (ea7bf38c8de64cc3f9acb4d25f644e59)", CLIENT_NAME);
 	/*
 	if(GIT_SHORTREV_HASH)
 	{
