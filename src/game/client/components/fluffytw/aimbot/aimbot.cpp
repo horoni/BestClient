@@ -153,7 +153,7 @@ bool FAimbot::PredictTool(TOOL tool, vec2 &myPos, vec2 myVel, vec2 &targetPos, v
 		toolFireSpeed = Tuning()->m_ShotgunSpeed;
 
 	const float toolSpeed = length(targetVel) + toolFireSpeed;
-	const float a = dot(deltaVel, deltaVel) - powf(hookSpeed, 2);
+	const float a = dot(deltaVel, deltaVel) - powf(toolSpeed, 2);
 	const float b = 2.f * dot(deltaVel, delta);
 	const float c = dot(delta, delta);
 
