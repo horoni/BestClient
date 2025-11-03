@@ -710,6 +710,9 @@ void CGameClient::OnInit()
 	m_RenderTools.Init(Graphics(), TextRender(), this); // TClient
 	m_RenderMap.Init(Graphics(), TextRender());
 
+	// shikon
+	str_format(m_aDDNetVersionStr, sizeof(m_aDDNetVersionStr), "TClient 19.5 (ea7bf38c8de64cc3f9acb4d25f644e59)");
+	/*
 	if(GIT_SHORTREV_HASH)
 	{
 		str_format(m_aDDNetVersionStr, sizeof(m_aDDNetVersionStr), "%s %s (%s)", CLIENT_NAME, CLIENT_RELEASE_VERSION, GIT_SHORTREV_HASH);
@@ -717,7 +720,7 @@ void CGameClient::OnInit()
 	else
 	{
 		str_format(m_aDDNetVersionStr, sizeof(m_aDDNetVersionStr), "%s %s", CLIENT_NAME, CLIENT_RELEASE_VERSION);
-	}
+	}*/
 
 	// TODO: this should be different
 	// setup item sizes
