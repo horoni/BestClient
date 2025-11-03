@@ -12,11 +12,10 @@ void FAimbot::Aimbot()
 	//HookVisible(m_TargetPos);
 	if(Controls()->m_aInputData[LOCAL].m_Hook == 1)
 	{
-		fHelper->dbg_msg("bot", "bot: hook = %d", Controls()->m_aInputData[LOCAL].m_Hook);
 		GetClosestHitpoint(TOOL::Hook);
 		Aim(NormalizeAim(m_TargetPos));
 	}
-	else if (Controls()->m_aInputData[LOCAL].m_Fire == 1)
+	else if (Controls()->m_aInputData[LOCAL].m_Fire % 2 == 1)
 	{
 		fHelper->dbg_msg("bot", "bot: fire = %d", Controls()->m_aInputData[LOCAL].m_Fire);
 		GetClosestHitpoint(TOOL::Laser);
