@@ -2394,6 +2394,7 @@ set_src(ENGINE_SHARED GLOB_RECURSE src/engine/shared
   config_includes.h
   config_variables.h
   config_variables_bestclient.h
+  config_variables_shikon.h
   config_variables_tclient.h
   console.cpp
   console.h
@@ -2714,6 +2715,17 @@ if(CLIENT)
     components/envelope_state.h
     components/flow.cpp
     components/flow.h
+    components/fluffytw/aimbot/aimbot.cpp
+    components/fluffytw/aimbot/aimbot.h
+    components/fluffytw/aimbot/aimbot_scans.cpp
+    components/fluffytw/f_bots.cpp
+    components/fluffytw/f_bots.h
+    components/fluffytw/f_component.h
+    components/fluffytw/f_helper.cpp
+    components/fluffytw/f_helper.h
+    components/fluffytw/f_visuals-base.cpp
+    components/fluffytw/f_visuals.cpp
+    components/fluffytw/f_visuals.h
     components/freezebars.cpp
     components/freezebars.h
     components/ghost.cpp
@@ -3048,8 +3060,6 @@ if(CLIENT)
   )
 
   list(REMOVE_ITEM GAME_CLIENT "${PROJECT_SOURCE_DIR}/src/game/client/components/bestclient/voice/server.cpp")
-
-  add_subdirectory(src/game/client/components/fluffytw)
 
   set(CLIENT_SRC ${ENGINE_CLIENT} ${PLATFORM_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_MAP} ${GAME_GENERATED_CLIENT})
 
