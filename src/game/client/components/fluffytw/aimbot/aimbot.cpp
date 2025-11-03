@@ -2,11 +2,6 @@
 #include "game/client/components/fluffytw/f_helper.h"
 #include "aimbot.h"
 
-enum class TOOL {
-	Hook,
-	Laser,
-};
-
 void FAimbot::Aimbot()
 {
 	if(!g_Config.m_ClAimbotEnable)

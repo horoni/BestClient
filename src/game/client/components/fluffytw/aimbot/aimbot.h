@@ -3,6 +3,11 @@
 #include "game/client/components/fluffytw/f_component.h"
 #include <game/client/gameclient.h>
 
+enum class TOOL {
+	Hook,
+	Laser,
+};
+
 class FAimbot : public FComponent
 {
 public:
