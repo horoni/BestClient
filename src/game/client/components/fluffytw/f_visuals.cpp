@@ -9,15 +9,13 @@ void FVisuals::Run(int ClientID, float Angle, vec2 Position)
 	DrawFov();
 }
 
-
-// Fov
 void FVisuals::DrawFov()
 {
 	if(g_Config.m_ClEspHookFov)
 		DrawFovF(g_Config.m_ClAimbotHookFov, g_Config.m_ClEspHookFovCol);
 
 	if(g_Config.m_ClEspWeaponFov) {
-		int SelectedWeapon = m_pClient->m_CursorInfo.Weapon();
+		int SelectedWeapon = m_pClient->m_Snap.m_pLocalCharacter->m_Weapon;
 		switch (SelectedWeapon) {
 			case 0:
 				DrawFovF(g_Config.m_ClAimbotHammerFov, g_Config.m_ClEspWeaponFovCol);
@@ -56,4 +54,3 @@ void FVisuals::DrawFovLine(float Offset, ColorRGBA Color)
 
 	DrawLine(InitPos, FinishPos, Color);
 }
-

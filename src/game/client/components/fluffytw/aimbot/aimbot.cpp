@@ -17,10 +17,10 @@ void FAimbot::Aimbot()
 	}
 	else if (Controls()->m_aInputData[LOCAL].m_Fire % 2 == 1)
 	{
-		TOOL SelTool = (TOOL)(m_pClient->m_CursorInfo.Weapon() + 1);
+		TOOL SelTool = (TOOL)(m_pClient->m_Snap.m_pLocalCharacter->m_Weapon + 1);
 
 		if (g_Config.m_ClShikonDbg) {
-			fHelper->dbg_msg("bot", "bot: fire = %d; w = %d", Controls()->m_aInputData[LOCAL].m_Fire, m_pClient->m_CursorInfo.Weapon());
+			fHelper->dbg_msg("bot", "bot: fire = %d; cursor w = %d; snap w = %d", Controls()->m_aInputData[LOCAL].m_Fire, m_pClient->m_CursorInfo.Weapon(), m_pClient->m_Snap.m_pLocalCharacter->m_Weapon);
 		}
 
 		if (SelTool == TOOL::Laser && g_Config.m_ClAimbotLaser)
