@@ -17,14 +17,22 @@ void FAimbot::Aimbot()
 	}
 	else if (Controls()->m_aInputData[LOCAL].m_Fire % 2 == 1)
 	{
-		TOOL SelTool = (TOOL)(m_pClient->m_Snap.m_pLocalCharacter->m_Weapon + 1);
+		TOOL SelectedWeapon;
+		if (m_pClient->m_Snap.m_pLocalCharacter)
+			SelectedWeapon = (TOOL)(m_pClient->m_Snap.m_pLocalCharacter->m_Weapon + 1);
+		else return;
 
 		if (g_Config.m_ClShikonDbg) {
-			fHelper->dbg_msg("bot", "bot: fire = %d; cursor w = %d; snap w = %d", Controls()->m_aInputData[LOCAL].m_Fire, m_pClient->m_CursorInfo.Weapon(), m_pClient->m_Snap.m_pLocalCharacter->m_Weapon);
+			fHelper->dbg_msg("bot", "bot: fire = %d; cursor w = %d; snap w = %d",
+          Controls()->m_aInputData[LOCAL].m_Fire,
+          m_pClient->m_CursorInfo.Weapon(),
+          m_pClient->m_Snap.m_pLocalCharacter ? 
+            m_pClient->m_Snap.m_pLocalCharacter->m_Weapon : -1
+      );
 		}
 
-		if (SelTool == TOOL::Laser && g_Config.m_ClAimbotLaser)
-			GetClosestHitpoint(SelTool);
+		if (SelectedWeapon == TOOL::Laser && g_Config.m_ClAimbotLaser)
+			GetClosestHitpoint(SelectedWeapon);
 
 		// TODO(horoni): do not aim if no weapon aimbot is enabled
 		Aim(NormalizeAim(m_TargetPos));
