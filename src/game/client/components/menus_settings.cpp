@@ -3195,27 +3195,145 @@ void CMenus::RenderSettingsAppearance(CUIRect MainView)
 
 void CMenus::RenderSettingsShikon(CUIRect MainView)
 {
-	CUIRect Button, Left;
-	const float LineMargin = 20.0f;
+	CUIRect Column, LeftView, RightView, Button, Label;
 
-	MainView.HSplitTop(150.0f, nullptr, &Left);
-	Left.HSplitTop(10.0f, nullptr, &Left);
-	Left.HSplitTop(20.0f, &Button, &Left);
+	const float LineSize = 20.0f;
+	const float HeadlineFontSize = 20.0f;
 
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShikonDbg, ("Debug"), &g_Config.m_ClShikonDbg, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEsp, ("ESP"), &g_Config.m_ClEsp, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspFov, ("Draw FOV"), &g_Config.m_ClEspFov, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbot, ("Aimbot"), &g_Config.m_ClAimbot, &MainView, LineMargin);
-	Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHookFov, &g_Config.m_ClAimbotHookFov, &Button, ("Hook FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
-//	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotFov, ("FOV"), &g_Config.m_ClAimbotFov, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotSilent, ("Silent"), &g_Config.m_ClAimbotSilent, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookVisible, ("Hook visible"), &g_Config.m_ClAimbotHookVisible, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookEdge, ("Hook Edge Scan"), &g_Config.m_ClAimbotHookEdge, &MainView, LineMargin);
+	const float HeadlineHeight = HeadlineFontSize + 0.0f;
+	const float Margin = 10.0f;
+	const float MarginSmall = 5.0f;
+	const float MarginExtraSmall = 2.5f;
+	const float MarginBetweenSections = 30.0f;
+	const float MarginBetweenViews = 30.0f;
 
-	Left.HSplitTop(10.0f, nullptr, &Left);
-	Left.HSplitTop(20.0f, &Button, &Left);
-	Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHookEdgeAccuracy, &g_Config.m_ClAimbotHookEdgeAccuracy, &Button, ("Accuracy"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
-//	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotEdgeAccuracy, ("Accuracy"), &g_Config.m_AimbotEdgeAccuracy, &MainView, LineMargin);
+	static CScrollRegion s_ScrollRegion;
+	vec2 ScrollOffset(0.0f, 0.0f);
+	CScrollRegionParams ScrollParams;
+	ScrollParams.m_ScrollUnit = 120.0f;
+	ScrollParams.m_Flags = CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
+	ScrollParams.m_ScrollbarMargin = 5.0f;
+	s_ScrollRegion.Begin(&MainView, &ScrollOffset, &ScrollParams);
+
+	static std::vector<CUIRect> s_SectionBoxes;
+	static vec2 s_PrevScrollOffset(0.0f, 0.0f);
+
+	MainView.y += ScrollOffset.y;
+
+	MainView.VSplitRight(5.0f, &MainView, nullptr); // Padding for scrollbar
+	MainView.VSplitLeft(5.0f, nullptr, &MainView); // Padding for scrollbar
+
+	MainView.VSplitMid(&LeftView, &RightView, MarginBetweenViews);
+	LeftView.VSplitLeft(MarginSmall, nullptr, &LeftView);
+	RightView.VSplitRight(MarginSmall, &RightView, nullptr);
+
+	for(CUIRect &Section : s_SectionBoxes)
+	{
+		float Padding = MarginBetweenViews * 0.6666f;
+		Section.w += Padding;
+		Section.h += Padding;
+		Section.x -= Padding * 0.5f;
+		Section.y -= Padding * 0.5f;
+		Section.y -= s_PrevScrollOffset.y - ScrollOffset.y;
+		Section.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
+	}
+	s_PrevScrollOffset = ScrollOffset;
+	s_SectionBoxes.clear();
+
+	// ***** LeftView ***** //
+	Column = LeftView;
+
+	// ***** WeaponAim ***** //
+	Column.HSplitTop(Margin, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, "Aimbot", HeadlineFontSize, TEXTALIGN_ML);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbot, ("Enable"), &g_Config.m_ClAimbot, &Column, LineSize);
+	if (g_Config.m_ClAimbot)
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotSilent, ("Silent"), &g_Config.m_ClAimbotSilent, &Column, LineSize);
+	else
+		Column.HSplitTop(LineSize, nullptr, &Column);
+
+	if (g_Config.m_ClAimbot)
+	{
+		static int s_SelectedWeapon = 0;
+		static std::vector<const char *> s_WeaponDropDownNames;
+		s_WeaponDropDownNames = {Localize("Hook"), Localize("Hammer"), Localize("Gun"), Localize("Shotgun"), Localize("Grenade"), Localize("Laser")};
+		static CUi::SDropDownState s_WeaponDropDownState;
+		static CScrollRegion s_WeaponDropDownScrollRegion;
+		s_WeaponDropDownState.m_SelectionPopupContext.m_pScrollRegion = &s_WeaponDropDownScrollRegion;
+		int WeaponSelectedOld = s_SelectedWeapon /* - 1*/ ;
+		CUIRect WeaponDropDownRect;
+		Column.HSplitTop(LineSize, &WeaponDropDownRect, &Column);
+		const int WeaponSelectedNew = Ui()->DoDropDown(&WeaponDropDownRect, WeaponSelectedOld, s_WeaponDropDownNames.data(), s_WeaponDropDownNames.size(), s_WeaponDropDownState);
+		if(WeaponSelectedOld != WeaponSelectedNew)
+		{
+			s_SelectedWeapon = WeaponSelectedNew /* + 1*/;
+		}
+
+		/*char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "old: %d; new: %d; sel: %d;", WeaponSelectedOld, WeaponSelectedNew, s_SelectedWeapon);
+		Column.HSplitTop(HeadlineHeight, &Label, &Column);
+		Ui()->DoLabel(&Label, aBuf, HeadlineFontSize, TEXTALIGN_ML);*/
+
+		if (s_SelectedWeapon == 0) { // Hook
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHook, ("Aimbot"), &g_Config.m_ClAimbotHook, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHookFov, &g_Config.m_ClAimbotHookFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookEdge, ("Hook Edge Scan"), &g_Config.m_ClAimbotHookEdge, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHookEdgeAccuracy, &g_Config.m_ClAimbotHookEdgeAccuracy, &Button, ("Accuracy"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
+		} else if (s_SelectedWeapon == 1) { // Hammer
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHammer, ("Aimbot"), &g_Config.m_ClAimbotHammer, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHammerFov, &g_Config.m_ClAimbotHammerFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+		} else if (s_SelectedWeapon == 2) { // Gun
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotGun, ("Aimbot"), &g_Config.m_ClAimbotGun, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotGunFov, &g_Config.m_ClAimbotGunFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+		} else if (s_SelectedWeapon == 3) { // Shotgun
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotShotgun, ("Aimbot"), &g_Config.m_ClAimbotShotgun, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotShotgunFov, &g_Config.m_ClAimbotShotgunFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+		} else if (s_SelectedWeapon == 4) { // Grenade
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotGrenade, ("Aimbot"), &g_Config.m_ClAimbotGrenade, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotGrenadeFov, &g_Config.m_ClAimbotGrenadeFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+		} else if (s_SelectedWeapon == 5) { // Laser
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotLaser, ("Aimbot"), &g_Config.m_ClAimbotLaser, &Column, LineSize);
+			Column.HSplitTop(LineSize, &Button, &Column);
+			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotLaserFov, &g_Config.m_ClAimbotLaserFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+		}
+	}
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// ***** Other ***** //
+	Column.HSplitTop(MarginBetweenSections, nullptr, &Column);
+	s_SectionBoxes.push_back(Column);
+	Column.HSplitTop(HeadlineHeight, &Label, &Column);
+	Ui()->DoLabel(&Label, "Other", HeadlineFontSize, TEXTALIGN_ML);
+	Column.HSplitTop(MarginSmall, nullptr, &Column);
+
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShikonDbg, ("Debug"), &g_Config.m_ClShikonDbg, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEsp, ("ESP"), &g_Config.m_ClEsp, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspFov, ("Draw FOV"), &g_Config.m_ClEspFov, &Column, LineSize);
+	//DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookVisible, ("Hook visible"), &g_Config.m_ClAimbotHookVisible, &Column, LineSize);
+
+	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
+	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
+
+	// Scroll
+	CUIRect ScrollRegion;
+	ScrollRegion.x = MainView.x;
+	ScrollRegion.y = maximum(LeftView.y, RightView.y) + MarginSmall * 2.0f;
+	ScrollRegion.w = MainView.w;
+	ScrollRegion.h = 0.0f;
+	s_ScrollRegion.AddRect(ScrollRegion);
+	s_ScrollRegion.End();
 }
 
 void CMenus::RenderSettingsDDNet(CUIRect MainView)

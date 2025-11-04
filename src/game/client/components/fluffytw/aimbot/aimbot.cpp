@@ -8,9 +8,9 @@ void FAimbot::Aimbot()
 		return;
 
 	// Get closest hook point into `m_TargetPos`
-	
+
 	//HookVisible(m_TargetPos);
-	if(Controls()->m_aInputData[LOCAL].m_Hook == 1)
+	if(Controls()->m_aInputData[LOCAL].m_Hook == 1 && g_Config.m_ClAimbotHook)
 	{
 		GetClosestHitpoint(TOOL::Hook);
 		Aim(NormalizeAim(m_TargetPos));
@@ -26,7 +26,7 @@ void FAimbot::Aimbot()
 		if (SelTool == TOOL::Laser && g_Config.m_ClAimbotLaser)
 			GetClosestHitpoint(SelTool);
 
-    // TODO(horoni): do not aim if no weapon aimbot is enabled
+		// TODO(horoni): do not aim if no weapon aimbot is enabled
 		Aim(NormalizeAim(m_TargetPos));
 	}
 	else
@@ -131,7 +131,7 @@ int FAimbot::GetClosestId(int Fov, float Range)
 			return ClosestID;
 		static int s_LastHookedId = m_pClient->m_Snap.m_pLocalCharacter->m_HookedPlayer;
 		if(fHelper->IsValidId(s_LastHookedId) &&
-		   length(m_pClient->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < Tuning()->m_HookLength + PHYS_SIZE * 0.5f)
+			length(m_pClient->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < Tuning()->m_HookLength + PHYS_SIZE * 0.5f)
 			return ClosestID;
 		if(ClosestID == -1 && distance(Pos, Position) < Distance)
 		{
