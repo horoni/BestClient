@@ -13,25 +13,47 @@ void FVisuals::Run(int ClientID, float Angle, vec2 Position)
 // Fov
 void FVisuals::DrawFov()
 {
-	if(!g_Config.m_ClEspFov)
-		return;
-	DrawFovLine(g_Config.m_ClAimbotHookFov * 0.01f);
-	DrawFovLine(g_Config.m_ClAimbotHookFov * -0.01f);
-  // TODO(horoni): Draw weapon FOV 
+	if(g_Config.m_ClEspHookFov)
+		DrawFovF(g_Config.m_ClAimbotHookFov, g_Config.m_ClEspHookFovCol);
+
+	if(g_Config.m_ClEspWeaponFov) {
+		int SelectedWeapon = m_pClient->m_CursorInfo.Weapon();
+		switch (SelectedWeapon) {
+			case 0:
+				DrawFovF(g_Config.m_ClAimbotHammerFov, g_Config.m_ClEspWeaponFovCol);
+				break;
+			case 1:
+				DrawFovF(g_Config.m_ClAimbotGunFov, g_Config.m_ClEspWeaponFovCol);
+				break;
+			case 2:
+				DrawFovF(g_Config.m_ClAimbotShotgunFov, g_Config.m_ClEspWeaponFovCol);
+				break;
+			case 3:
+				DrawFovF(g_Config.m_ClAimbotGrenadeFov, g_Config.m_ClEspWeaponFovCol);
+				break;
+			case 4:
+				DrawFovF(g_Config.m_ClAimbotLaserFov, g_Config.m_ClEspWeaponFovCol);
+				break;
+		}
+	}
 }
 
-void FVisuals::DrawFovLine(float offset)
+void FVisuals::DrawFovF(int Fov, ColorRGBA Color) {
+	DrawFovLine(Fov * 0.01f, Color);
+	DrawFovLine(Fov * -0.01f, Color);
+}
+
+void FVisuals::DrawFovLine(float Offset, ColorRGBA Color)
 {
-	const float Angle = angle(Controls()->m_aMousePos[g_Config.m_ClDummy]) + offset;
+	const float Angle = angle(Controls()->m_aMousePos[g_Config.m_ClDummy]) + Offset;
 	const vec2 ExDirection = normalize(direction(Angle));
 
 	const vec2 InitPos = m_pClient->m_LocalCharacterPos;
 	vec2 FinishPos = InitPos + ExDirection * (Tuning()->m_HookLength);
 
-	int teleNr = 0;
-	Collision()->IntersectLineTeleHook(InitPos, FinishPos, &FinishPos, nullptr, &teleNr);
+	int TeleNr = 0;
+	Collision()->IntersectLineTeleHook(InitPos, FinishPos, &FinishPos, nullptr, &TeleNr);
 
-	const ColorRGBA HookCollColor(0.0f, 0.0f, 0.0f, 0.5f);
-	DrawLine(InitPos, FinishPos, HookCollColor);
+	DrawLine(InitPos, FinishPos, Color);
 }
 

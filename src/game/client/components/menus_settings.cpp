@@ -3198,6 +3198,7 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	CUIRect Column, LeftView, RightView, Button, Label;
 
 	const float LineSize = 20.0f;
+  const float ColorPickerLineSize = 25.0f;
 	const float HeadlineFontSize = 20.0f;
 
 	const float HeadlineHeight = HeadlineFontSize + 0.0f;
@@ -3206,6 +3207,9 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	const float MarginExtraSmall = 2.5f;
 	const float MarginBetweenSections = 30.0f;
 	const float MarginBetweenViews = 30.0f;
+
+  const float ColorPickerLabelSize = 13.0f;
+  const float ColorPickerLineSpacing = 5.0f;
 
 	static CScrollRegion s_ScrollRegion;
 	vec2 ScrollOffset(0.0f, 0.0f);
@@ -3273,11 +3277,6 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 			s_SelectedWeapon = WeaponSelectedNew /* + 1*/;
 		}
 
-		/*char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "old: %d; new: %d; sel: %d;", WeaponSelectedOld, WeaponSelectedNew, s_SelectedWeapon);
-		Column.HSplitTop(HeadlineHeight, &Label, &Column);
-		Ui()->DoLabel(&Label, aBuf, HeadlineFontSize, TEXTALIGN_ML);*/
-
 		if (s_SelectedWeapon == 0) { // Hook
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHook, ("Aimbot"), &g_Config.m_ClAimbotHook, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
@@ -3320,7 +3319,13 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShikonDbg, ("Debug"), &g_Config.m_ClShikonDbg, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEsp, ("ESP"), &g_Config.m_ClEsp, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspFov, ("Draw FOV"), &g_Config.m_ClEspFov, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspHookFov, ("Draw Hook FOV"), &g_Config.m_ClEspHookFov, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspWeaponFov, ("Draw Weapon FOV"), &g_Config.m_ClEspWeaponFov, &Column, LineSize);
+
+	static CButtonContainer s_HookFovColorId, s_WeaponFovColorId;
+	DoLine_ColorPicker(&s_HookFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Hook FOV Color"), &g_Config.m_ClEspHookFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
+	DoLine_ColorPicker(&s_WeaponFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Weapon FOV Color"), &g_Config.m_ClEspWeaponFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
+
 	//DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookVisible, ("Hook visible"), &g_Config.m_ClAimbotHookVisible, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);

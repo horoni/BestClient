@@ -12,12 +12,13 @@ public:
 	void Run(int ClientID, float Angle, vec2 Position);
 
 	// Draw
-	void DrawLine(vec2 pos1, vec2 pos2, ColorRGBA color = {1, 1, 1, 1});
-	void DrawCircle(vec2 pos, float size, ColorRGBA color = {1, 1, 1, 1});
-	void DrawBox(vec2 center, float size, ColorRGBA color = {1, 1, 1, 1});
+	void DrawLine(vec2 Pos1, vec2 Pos2, ColorRGBA Color = {1, 1, 1, 1});
+	void DrawCircle(vec2 Pos, float Size, ColorRGBA Color = {1, 1, 1, 1});
+	void DrawBox(vec2 Center, float Size, ColorRGBA Color = {1, 1, 1, 1});
 
 private:
 	// Aimbot Fov
 	void DrawFov();
-	void DrawFovLine(float offset);
+	void DrawFovF(int Fov, ColorRGBA Color);
+	void DrawFovLine(float Offset, ColorRGBA Color);
 };

@@ -9,9 +9,13 @@
 #endif
 
 MACRO_CONFIG_INT(ClShikonDbg, sh_dbg, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Sh Debug")
+
 // <><><> ESP <><><><><>
 MACRO_CONFIG_INT(ClEsp, sh_esp, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Esp enable")
-MACRO_CONFIG_INT(ClEspFov, sh_esp_fov, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draw FOV")
+MACRO_CONFIG_INT(ClEspHookFov, sh_esp_hook_fov, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draw Hook FOV")
+MACRO_CONFIG_INT(ClEspWeaponFov, sh_esp_weapon_fov, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draw Weapon FOV")
+MACRO_CONFIG_COL(ClEspHookFovCol, sh_esp_hook_fov_col, 4294901760, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Hook FOV Color")
+MACRO_CONFIG_COL(ClEspWeaponFovCol, sh_esp_weapon_fov_col, 4294901760, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Weapon FOV Color")
 
 // <><><> AimBot <><><><><>
 MACRO_CONFIG_INT(ClAimbot, sh_aimbot, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Aimbot enable")
@@ -43,4 +47,3 @@ MACRO_CONFIG_INT(ClAimbotGrenadeFov, sh_aimbot_grenade_fov, 1, 1, 360, CFGFLAG_C
 // <> Laser <>
 MACRO_CONFIG_INT(ClAimbotLaser, sh_aimbot_laser, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Laser Aimbot Enable")
 MACRO_CONFIG_INT(ClAimbotLaserFov, sh_aimbot_laser_fov, 1, 1, 360, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Laser Aimbot FOV")
-
