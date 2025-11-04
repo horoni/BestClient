@@ -15,7 +15,11 @@ void FVisuals::DrawFov()
 		DrawFovF(g_Config.m_ClAimbotHookFov, g_Config.m_ClEspHookFovCol);
 
 	if(g_Config.m_ClEspWeaponFov) {
-		int SelectedWeapon = m_pClient->m_Snap.m_pLocalCharacter->m_Weapon;
+		int SelectedWeapon;
+		if (m_pClient->m_Snap.m_pLocalCharacter)
+			SelectedWeapon = m_pClient->m_Snap.m_pLocalCharacter->m_Weapon;
+		else return;
+
 		switch (SelectedWeapon) {
 			case 0:
 				DrawFovF(g_Config.m_ClAimbotHammerFov, g_Config.m_ClEspWeaponFovCol);
