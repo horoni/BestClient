@@ -4,7 +4,7 @@
 
 void FAimbot::Aimbot()
 {
-	if(!g_Config.m_ClAimbotEnable)
+	if(!g_Config.m_ClAimbot)
 		return;
 
 	// Get closest hook point into `m_TargetPos`
@@ -22,8 +22,11 @@ void FAimbot::Aimbot()
 		if (g_Config.m_ClShikonDbg) {
 			fHelper->dbg_msg("bot", "bot: fire = %d; w = %d", Controls()->m_aInputData[LOCAL].m_Fire, m_pClient->m_CursorInfo.Weapon());
 		}
-		if (SelTool == TOOL::Laser)
+
+		if (SelTool == TOOL::Laser && g_Config.m_ClAimbotLaser)
 			GetClosestHitpoint(SelTool);
+
+    // TODO(horoni): do not aim if no weapon aimbot is enabled
 		Aim(NormalizeAim(m_TargetPos));
 	}
 	else
@@ -70,10 +73,10 @@ void FAimbot::GetClosestHitpoint(TOOL Tool)
 {
 	switch(Tool) {
 		case TOOL::Hook:
-			m_TargetId = GetClosestId(g_Config.m_ClAimbotFov);
+			m_TargetId = GetClosestId(g_Config.m_ClAimbotHookFov);
 			break;
 		case TOOL::Laser:
-			m_TargetId = GetClosestId(g_Config.m_ClAimbotFov, 815.f);
+			m_TargetId = GetClosestId(g_Config.m_ClAimbotLaserFov, 815.f);
 			break;
 	}
 

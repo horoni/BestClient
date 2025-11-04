@@ -3,7 +3,7 @@
 
 void FVisuals::Run(int ClientID, float Angle, vec2 Position)
 {
-	if(!g_Config.m_ClEspEnable)
+	if(!g_Config.m_ClEsp)
 		return;
 	Graphics()->TextureClear();
 	DrawFov();
@@ -15,8 +15,9 @@ void FVisuals::DrawFov()
 {
 	if(!g_Config.m_ClEspFov)
 		return;
-	DrawFovLine(g_Config.m_ClAimbotFov * 0.01f);
-	DrawFovLine(g_Config.m_ClAimbotFov * -0.01f);
+	DrawFovLine(g_Config.m_ClAimbotHookFov * 0.01f);
+	DrawFovLine(g_Config.m_ClAimbotHookFov * -0.01f);
+  // TODO(horoni): Draw weapon FOV 
 }
 
 void FVisuals::DrawFovLine(float offset)
@@ -33,3 +34,4 @@ void FVisuals::DrawFovLine(float offset)
 	const ColorRGBA HookCollColor(0.0f, 0.0f, 0.0f, 0.5f);
 	DrawLine(InitPos, FinishPos, HookCollColor);
 }
+

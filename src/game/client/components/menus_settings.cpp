@@ -3203,18 +3203,18 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	Left.HSplitTop(20.0f, &Button, &Left);
 
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShikonDbg, ("Debug"), &g_Config.m_ClShikonDbg, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspEnable, ("ESP"), &g_Config.m_ClEspEnable, &MainView, LineMargin);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEsp, ("ESP"), &g_Config.m_ClEsp, &MainView, LineMargin);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspFov, ("Draw FOV"), &g_Config.m_ClEspFov, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotEnable, ("Aimbot"), &g_Config.m_ClAimbotEnable, &MainView, LineMargin);
-	Ui()->DoScrollbarOption(&g_Config.m_ClAimbotFov, &g_Config.m_ClAimbotFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbot, ("Aimbot"), &g_Config.m_ClAimbot, &MainView, LineMargin);
+	Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHookFov, &g_Config.m_ClAimbotHookFov, &Button, ("Hook FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
 //	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotFov, ("FOV"), &g_Config.m_ClAimbotFov, &MainView, LineMargin);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotSilent, ("Silent"), &g_Config.m_ClAimbotSilent, &MainView, LineMargin);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookVisible, ("Hook visible"), &g_Config.m_ClAimbotHookVisible, &MainView, LineMargin);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotEdge, ("Edge"), &g_Config.m_ClAimbotEdge, &MainView, LineMargin);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookEdge, ("Hook Edge Scan"), &g_Config.m_ClAimbotHookEdge, &MainView, LineMargin);
 
 	Left.HSplitTop(10.0f, nullptr, &Left);
 	Left.HSplitTop(20.0f, &Button, &Left);
-	Ui()->DoScrollbarOption(&g_Config.m_ClAimbotEdgeAccuracy, &g_Config.m_ClAimbotEdgeAccuracy, &Button, ("Accuracy"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
+	Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHookEdgeAccuracy, &g_Config.m_ClAimbotHookEdgeAccuracy, &Button, ("Accuracy"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
 //	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotEdgeAccuracy, ("Accuracy"), &g_Config.m_AimbotEdgeAccuracy, &MainView, LineMargin);
 }
 

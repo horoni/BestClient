@@ -23,7 +23,7 @@ vec2 FAimbot::EdgeScan(TOOL Tool)
 	}
 
 	// If hitpoint scan is disabled and normal scan failed, return
-	if(!g_Config.m_ClAimbotEdge)
+	if(!g_Config.m_ClAimbotHookEdge || Tool != TOOL::Hook)
 		return vec2(0, 0);
 
 	/* Gets the angle we should be able to hook
@@ -38,7 +38,7 @@ vec2 FAimbot::EdgeScan(TOOL Tool)
 	 *      targetPos
 	*/
 	const float VisibleAngle = atan2(TargetPos.y - MyPos.y, TargetPos.x - MyPos.x) + pi * 0.5f;
-	for(float i = VisibleAngle; i < pi + VisibleAngle; i += 1.f / g_Config.m_ClAimbotEdgeAccuracy)
+	for(float i = VisibleAngle; i < pi + VisibleAngle; i += 1.f / g_Config.m_ClAimbotHookEdgeAccuracy)
 	{
 		// Return if we have enough hitpoints
 		if(HitPointsCount >= MAX_HITPOINTS)
