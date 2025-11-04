@@ -1,25 +1,25 @@
 #include "aimbot.h"
 #include "game/client/components/fluffytw/f_helper.h"
 
-vec2 FAimbot::EdgeScan(TOOL tool)
+vec2 FAimbot::EdgeScan(TOOL Tool)
 {
-	int hitPointsCount = 0;
-	vec2 hitPoints[MAX_HITPOINTS];
+	int HitPointsCount = 0;
+	vec2 HitPoints[MAX_HITPOINTS];
 
-	vec2 myPos = m_MyPos;
-	vec2 targetPos = m_TargetPos;
+	vec2 MyPos = m_MyPos;
+	vec2 TargetPos = m_TargetPos;
 
 	m_TargetVisible = false;
 
 	// Predict hook and return, if it's impossible
-	if(!PredictTool(tool, myPos, m_MyVel, targetPos, m_TargetVel))
+	if(!PredictTool(Tool, MyPos, m_MyVel, TargetPos, m_TargetVel))
 		return vec2(0, 0);
 
 	// If player is hookable right away, return the position
-	if(HitScanTool(tool, myPos, targetPos, targetPos - myPos))
+	if(HitScanTool(Tool, MyPos, TargetPos, TargetPos - MyPos))
 	{
 		m_TargetVisible = true;
-		return targetPos - myPos;
+		return TargetPos - MyPos;
 	}
 
 	// If hitpoint scan is disabled and normal scan failed, return
@@ -37,36 +37,37 @@ vec2 FAimbot::EdgeScan(TOOL tool)
 	 * |__a\
 	 *      targetPos
 	*/
-	const float visibleAngle = atan2(targetPos.y - myPos.y, targetPos.x - myPos.x) + pi * 0.5f;
-	for(float i = visibleAngle; i < pi + visibleAngle; i += 1.f / g_Config.m_ClAimbotEdgeAccuracy)
+	const float VisibleAngle = atan2(TargetPos.y - MyPos.y, TargetPos.x - MyPos.x) + pi * 0.5f;
+	for(float i = VisibleAngle; i < pi + VisibleAngle; i += 1.f / g_Config.m_ClAimbotEdgeAccuracy)
 	{
 		// Return if we have enough hitpoints
-		if(hitPointsCount >= MAX_HITPOINTS)
+		if(HitPointsCount >= MAX_HITPOINTS)
 			break;
 
 		// Convert desired angle(hitpoint) to Cartesian coordinates
-		auto pos = vec2(static_cast<int>(targetPos.x + cosf(i) * PHYS_SIZE),
-			static_cast<int>(targetPos.y + sinf(i) * PHYS_SIZE));
-		const vec2 dir = pos - myPos;
+		auto Pos = vec2(static_cast<int>(TargetPos.x + cosf(i) * PHYS_SIZE),
+			static_cast<int>(TargetPos.y + sinf(i) * PHYS_SIZE));
+		const vec2 Dir = Pos - MyPos;
 
 		// Check if hitpoint is hookable and if it is
 		// append it to `hitPoints` and increase `hitPointsCount`
-		if(HitScanTool(tool, myPos, targetPos, dir))
+		if(HitScanTool(Tool, MyPos, TargetPos, Dir))
 		{
-			hitPoints[hitPointsCount] = dir;
-			hitPointsCount++;
+			HitPoints[HitPointsCount] = Dir;
+			HitPointsCount++;
 		}
 	}
 
 	// If hitpoints were found
 	// return the best(i.e. middle) hitpoint position
-	if(hitPointsCount > 0)
+	if(HitPointsCount > 0)
 	{
 		// Calculate the middle index of `hitPoints` array
-		const int middleIndex = (hitPointsCount - 1) / 2;
+		const int MiddleIndex = (HitPointsCount - 1) / 2;
 		m_TargetVisible = true;
-		m_TargetPos = hitPoints[middleIndex];
-		return hitPoints[middleIndex];
+		m_TargetPos = HitPoints[MiddleIndex];
+		return HitPoints[MiddleIndex];
 	}
 	return vec2(0, 0);
 }
+

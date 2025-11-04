@@ -19,27 +19,27 @@ public:
 		FComponent(pClient) {}
 
 	void Aimbot();
-	void HookVisible(vec2 targetPos);
+	void HookVisible(vec2 TargetPos);
 
 	// Gets
-	void GetClosestHitpoint(TOOL tool);
-	int GetClosestId(int fov = 360, float range = 395.f);
+	void GetClosestHitpoint(TOOL Tool);
+	int GetClosestId(int Fov = 360, float Range = 395.f);
 	[[nodiscard]] float GetPing() const;
 
 	// Helpers
-	bool PredictTool(TOOL tool, vec2 &myPos, vec2 myVel, vec2 &targetPos, vec2 targetVel);
-	bool HitScanTool(TOOL tool, vec2 InitPos, vec2 targetPos, vec2 scanDir);
-	bool IntersectCharacter(vec2 hookPos, vec2 targetPos, vec2 &newPos);
+	bool PredictTool(TOOL Tool, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel);
+	bool HitScanTool(TOOL Tool, vec2 InitPos, vec2 TargetPos, vec2 ScanDir);
+	bool IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos);
 
 	// Scans
-	vec2 EdgeScan(TOOL tool);
+	vec2 EdgeScan(TOOL Tool);
 
 	// Aim
 	vec2 NormalizeAim(vec2 Pos);
 	void Aim(vec2 Pos);
 
 	// Check
-	bool InFov(float fov, vec2 dir);
+	bool InFov(float Fov, vec2 Dir);
 
 	// Globals
 	bool m_CanAim = true;

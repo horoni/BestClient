@@ -17,32 +17,32 @@ void FAimbot::Aimbot()
 	}
 	else if (Controls()->m_aInputData[LOCAL].m_Fire % 2 == 1)
 	{
-		TOOL selTool = (TOOL)(m_pClient->m_CursorInfo.Weapon() + 1);
+		TOOL SelTool = (TOOL)(m_pClient->m_CursorInfo.Weapon() + 1);
 
 		if (g_Config.m_ClShikonDbg) {
 			fHelper->dbg_msg("bot", "bot: fire = %d; w = %d", Controls()->m_aInputData[LOCAL].m_Fire, m_pClient->m_CursorInfo.Weapon());
 		}
-		if (selTool == TOOL::Laser)
-			GetClosestHitpoint(selTool);
+		if (SelTool == TOOL::Laser)
+			GetClosestHitpoint(SelTool);
 		Aim(NormalizeAim(m_TargetPos));
 	}
 	else
 		m_CanAim = true;
 }
 
-void FAimbot::HookVisible(vec2 targetPos)
+void FAimbot::HookVisible(vec2 TargetPos)
 {
 	// Constant
-	static bool hasHooked = false;
+	static bool s_HasHooked = false;
 
 	// Reset input if needed and return
 	if(!g_Config.m_ClAimbotHookVisible)
 	{
-		if(hasHooked)
+		if(s_HasHooked)
 		{
 			Controls()->m_aLastData[LOCAL].m_Hook = 0;
 			Controls()->m_aInputData[LOCAL].m_Hook = Controls()->m_aLastData[LOCAL].m_Hook;
-			hasHooked = false;
+			s_HasHooked = false;
 		}
 		return;
 	}
@@ -53,22 +53,22 @@ void FAimbot::HookVisible(vec2 targetPos)
 
 	// Handle 'can aim' logic
 	m_CanAim = true;
-	if(hasHooked == true)
+	if(s_HasHooked == true)
 		m_CanAim = false;
 
 	// Aim and hook
-	Aim(NormalizeAim(targetPos));
+	Aim(NormalizeAim(TargetPos));
 	Controls()->m_aInputData[LOCAL].m_Hook = 1;
 
-	// Hooked, so update `hasHooked`
-	hasHooked = true;
+	// Hooked, so update `s_HasHooked`
+	s_HasHooked = true;
 }
 
 
 // Gets
-void FAimbot::GetClosestHitpoint(TOOL tool)
+void FAimbot::GetClosestHitpoint(TOOL Tool)
 {
-	switch(tool) {
+	switch(Tool) {
 		case TOOL::Hook:
 			m_TargetId = GetClosestId(g_Config.m_ClAimbotFov);
 			break;
@@ -90,31 +90,31 @@ void FAimbot::GetClosestHitpoint(TOOL tool)
 	m_MyVel = m_pClient->m_PredictedChar.m_Vel;
 	m_TargetPos = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Pos;
 	m_TargetVel = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Vel;
-	m_TargetPos = EdgeScan(tool);
+	m_TargetPos = EdgeScan(Tool);
 }
 
-int FAimbot::GetClosestId(int fov, float range)
+int FAimbot::GetClosestId(int Fov, float Range)
 {
 	const vec2 Pos = m_pClient->m_PredictedChar.m_Pos;
-	float Distance = range;
+	float Distance = Range;
 	int ClosestID = -1;
 
 	const CGameClient::CClientData OwnClientData = m_pClient->m_aClients[LOCAL_ID];
 
-	auto *player = dynamic_cast<CCharacter *>(m_pClient->m_GameWorld.FindFirst(m_pClient->m_GameWorld.ENTTYPE_CHARACTER));
-	for(; player; player = dynamic_cast<CCharacter *>(player->TypeNext()))
+	auto *Player = dynamic_cast<CCharacter *>(m_pClient->m_GameWorld.FindFirst(m_pClient->m_GameWorld.ENTTYPE_CHARACTER));
+	for(; Player; Player = dynamic_cast<CCharacter *>(Player->TypeNext()))
 	{
-		int i = player->GetId();
-		if(i == LOCAL_ID || !player)
+		int i = Player->GetId();
+		if(i == LOCAL_ID || !Player)
 			continue;
 
-		const CGameClient::CClientData cData = m_pClient->m_aClients[i];
-		if(!cData.m_Active)
+		const CGameClient::CClientData ClData = m_pClient->m_aClients[i];
+		if(!ClData.m_Active)
 			continue;
 		vec2 Position = m_pClient->m_aClients[i].m_Predicted.m_Pos;
 
-		const bool IsOneSolo = cData.m_Solo || OwnClientData.m_Solo;
-		const bool IsOneSpec = cData.m_Spec || OwnClientData.m_Spec;
+		const bool IsOneSolo = ClData.m_Solo || OwnClientData.m_Solo;
+		const bool IsOneSpec = ClData.m_Spec || OwnClientData.m_Spec;
 
 		if(IsOneSpec || IsOneSolo)
 			continue;
@@ -122,13 +122,13 @@ int FAimbot::GetClosestId(int fov, float range)
 		if(!m_pClient->m_Teams.SameTeam(i, LOCAL_ID) || OwnClientData.m_HookHitDisabled)
 			continue;
 
-		if(!InFov(fov, Position - Pos))
+		if(!InFov(Fov, Position - Pos))
 			continue;
 		if(ClosestID != -1 && GameWorld()->m_GameTick % 150 != 0)
 			return ClosestID;
-		static int lastHookedId = m_pClient->m_Snap.m_pLocalCharacter->m_HookedPlayer;
-		if(fHelper->IsValidId(lastHookedId) &&
-		   length(m_pClient->m_aClients[lastHookedId].m_Predicted.m_Pos - cData.m_Predicted.m_Pos) < Tuning()->m_HookLength + PHYS_SIZE * 0.5f)
+		static int s_LastHookedId = m_pClient->m_Snap.m_pLocalCharacter->m_HookedPlayer;
+		if(fHelper->IsValidId(s_LastHookedId) &&
+		   length(m_pClient->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < Tuning()->m_HookLength + PHYS_SIZE * 0.5f)
 			return ClosestID;
 		if(ClosestID == -1 && distance(Pos, Position) < Distance)
 		{
@@ -141,111 +141,111 @@ int FAimbot::GetClosestId(int fov, float range)
 
 float FAimbot::GetPing() const
 {
-	const auto realPing = static_cast<float>(Client()->GetPredictionTime());
-	const float ping = realPing / 100.f;
-	return ping;
+	const auto RealPing = static_cast<float>(Client()->GetPredictionTime());
+	const float Ping = RealPing / 100.f;
+	return Ping;
 }
 
 
 // <><><> Helpers <><><><><>
 
-bool FAimbot::PredictTool(TOOL tool, vec2 &myPos, vec2 myVel, vec2 &targetPos, vec2 targetVel)
+bool FAimbot::PredictTool(TOOL Tool, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel)
 {
-	const vec2 delta = targetPos - myPos;
-	const vec2 deltaVel = targetVel - myVel;
+	const vec2 Delta = TargetPos - MyPos;
+	const vec2 DeltaVel = TargetVel - MyVel;
 
-	float toolFireSpeed;
-	switch(tool) {
+	float ToolFireSpeed;
+	switch(Tool) {
 		case TOOL::Hook:
-			toolFireSpeed = Tuning()->m_HookFireSpeed;
+			ToolFireSpeed = Tuning()->m_HookFireSpeed;
 			break;
 		case TOOL::Laser:
-			toolFireSpeed = Tuning()->m_ShotgunSpeed;
+			ToolFireSpeed = Tuning()->m_ShotgunSpeed;
 			break;
 	}
 
-	const float toolSpeed = length(targetVel) + toolFireSpeed;
-	const float a = dot(deltaVel, deltaVel) - powf(toolSpeed, 2);
-	const float b = 2.f * dot(deltaVel, delta);
-	const float c = dot(delta, delta);
+	const float ToolSpeed = length(TargetVel) + ToolFireSpeed;
+	const float a = dot(DeltaVel, DeltaVel) - powf(ToolSpeed, 2);
+	const float b = 2.f * dot(DeltaVel, Delta);
+	const float c = dot(Delta, Delta);
 
-	const float sol = powf(b, 2) - 4.f * a * c;
-	if(sol > 0.f)
+	const float Sol = powf(b, 2) - 4.f * a * c;
+	if(Sol > 0.f)
 	{
 		// qTime is the same as time
 		// const float qTime = (-sqrt(sol) - b) / (2 * a);
-		const float time = abs(2.f * c / (sqrtf(sol) - b)) + GetPing();
-		targetPos += targetVel * time;
+		const float Time = abs(2.f * c / (sqrtf(Sol) - b)) + GetPing();
+		TargetPos += TargetVel * Time;
 		return true;
 	}
 	return false;
 }
 
 
-bool FAimbot::HitScanTool(TOOL tool, vec2 initPos, vec2 targetPos, vec2 scanDir)
+bool FAimbot::HitScanTool(TOOL Tool, vec2 InitPos, vec2 TargetPos, vec2 ScanDir)
 {
-	float toolFireSpeed;
-	float toolLength;
+	float ToolFireSpeed;
+	float ToolLength;
 
-	switch(tool) {
+	switch(Tool) {
 		case TOOL::Hook:
-			toolFireSpeed = Tuning()->m_HookFireSpeed;
-			toolLength = Tuning()->m_HookLength;
+			ToolFireSpeed = Tuning()->m_HookFireSpeed;
+			ToolLength = Tuning()->m_HookLength;
 			break;
 		case TOOL::Laser:
-			toolFireSpeed = Tuning()->m_ShotgunSpeed;
-			toolLength = Tuning()->m_LaserReach;
+			ToolFireSpeed = Tuning()->m_ShotgunSpeed;
+			ToolLength = Tuning()->m_LaserReach;
 			break;
 	}
 
-	vec2 exDirection = normalize(scanDir);
-	vec2 finishPos = initPos + exDirection * (toolLength - PHYS_SIZE * 1.5f);
+	vec2 ExDirection = normalize(ScanDir);
+	vec2 FinishPos = InitPos + ExDirection * (ToolLength - PHYS_SIZE * 1.5f);
 
-	vec2 oldPos = initPos + exDirection * PHYS_SIZE * 1.5f;
-	vec2 newPos = oldPos;
+	vec2 OldPos = InitPos + ExDirection * PHYS_SIZE * 1.5f;
+	vec2 NewPos = OldPos;
 
 	bool DoBreak = false;
 
 	do
 	{
-		oldPos = newPos;
-		newPos = oldPos + exDirection * toolFireSpeed;
+		OldPos = NewPos;
+		NewPos = OldPos + ExDirection * ToolFireSpeed;
 
-		if(distance(initPos, newPos) > toolLength)
+		if(distance(InitPos, NewPos) > ToolLength)
 		{
-			newPos = initPos + normalize(newPos - initPos) * toolLength;
+			NewPos = InitPos + normalize(NewPos - InitPos) * ToolLength;
 			DoBreak = true;
 		}
 
 		int TeleNr = 0;
-		const int Hit = Collision()->IntersectLineTeleHook(oldPos, newPos, &finishPos, nullptr, &TeleNr);
+		const int Hit = Collision()->IntersectLineTeleHook(OldPos, NewPos, &FinishPos, nullptr, &TeleNr);
 
-		if(IntersectCharacter(oldPos, targetPos, finishPos))
+		if(IntersectCharacter(OldPos, TargetPos, FinishPos))
 			return true;
 
 		if(Hit)
 			break;
 
-		newPos.x = round_to_int(newPos.x);
-		newPos.y = round_to_int(newPos.y);
+		NewPos.x = round_to_int(NewPos.x);
+		NewPos.y = round_to_int(NewPos.y);
 
-		if(oldPos == newPos)
+		if(OldPos == NewPos)
 			break;
 
-		exDirection.x = round_to_int(exDirection.x * 256.0f) / 256.0f;
-		exDirection.y = round_to_int(exDirection.y * 256.0f) / 256.0f;
+		ExDirection.x = round_to_int(ExDirection.x * 256.0f) / 256.0f;
+		ExDirection.y = round_to_int(ExDirection.y * 256.0f) / 256.0f;
 	} while(!DoBreak);
 	return false;
 }
 
-bool FAimbot::IntersectCharacter(vec2 hookPos, vec2 targetPos, vec2 &newPos)
+bool FAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 {
-	vec2 closestPoint;
-	if(closest_point_on_line(hookPos, newPos, targetPos, closestPoint))
+	vec2 ClosestPoint;
+	if(closest_point_on_line(HookPos, NewPos, TargetPos, ClosestPoint))
 	{
-		if(distance(targetPos, closestPoint) < PHYS_SIZE + 2.f)
+		if(distance(TargetPos, ClosestPoint) < PHYS_SIZE + 2.f)
 		{
-			newPos = closestPoint;
+			NewPos = ClosestPoint;
 			return true;
 		}
 	}
@@ -294,11 +294,11 @@ void FAimbot::Aim(vec2 Pos)
 
 
 // Check
-bool FAimbot::InFov(float fov, vec2 dir)
+bool FAimbot::InFov(float Fov, vec2 Dir)
 {
-	const float differenceAngle = abs(atan2(sin(angle(dir) - angle(Controls()->m_aMousePos[LOCAL])),
-		                              cos(angle(dir) - angle(Controls()->m_aMousePos[LOCAL])))) * 100.f;
-	if(differenceAngle > fov)
+	const float DifferenceAngle = abs(atan2(sin(angle(Dir) - angle(Controls()->m_aMousePos[LOCAL])),
+		                              cos(angle(Dir) - angle(Controls()->m_aMousePos[LOCAL])))) * 100.f;
+	if(DifferenceAngle > Fov)
 		return false;
 	return true;
 }
