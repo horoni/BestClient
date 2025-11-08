@@ -3,20 +3,6 @@
 #include <game/client/components/fluffytw/f_component.h>
 #include "aimbot.h"
 
-// Change prefix of all config variables to Sh
-// Make Auto Laser
-// Fix Laser Fire speed
-// Make "force FNG" in settings
-// Add "force FNG" variable
-// Implement Weapons values for PredictWeapon and HitScanWeapon
-
-// TODO(horoni): Auto Laser Switch Weapon to Laser if not 
-// TODO(horoni): Implement grenade prediction
-// TODO(horoni): `HitScanWeapon`: IntersectLineTeleHook can it be used with any weapon? 
-// TODO(horoni): Maybe there is a better way to detect shotgun mode? 
-// TODO(horoni): Use Local Tuning instead Global
-// TODO(horoni): Fix weapon reach constants
-
 #define INSTANT_SPEED 10000.f
 
 void FAimbot::Aimbot()

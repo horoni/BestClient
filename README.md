@@ -10,6 +10,10 @@
 </div>
 
 ## About
+### Shikon Client
+[README](src/game/client/components/fluffytw/README.md)
+
+### BestClient
 
 BestClient is a customized DDNet client built around native BestClient systems instead of a thin reskin.
 The project adds its own rendering stack, input tools, social systems, editors, in-client content flow, and UI modules while staying in the DDNet ecosystem.
