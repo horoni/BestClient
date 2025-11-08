@@ -1,41 +1,71 @@
 ﻿#include "game/client/prediction/entities/character.h"
 #include "game/client/components/fluffytw/f_helper.h"
+#include <game/client/components/fluffytw/f_component.h>
 #include "aimbot.h"
+
+// Change prefix of all config variables to Sh
+// Make Auto Laser
+// Fix Laser Fire speed
+// Make "force FNG" in settings
+// Add "force FNG" variable
+// Implement Weapons values for PredictWeapon and HitScanWeapon
+
+// TODO(horoni): Auto Laser Switch Weapon to Laser if not 
+// TODO(horoni): Implement grenade prediction
+// TODO(horoni): `HitScanWeapon`: IntersectLineTeleHook can it be used with any weapon? 
+// TODO(horoni): Maybe there is a better way to detect shotgun mode? 
+// TODO(horoni): Use Local Tuning instead Global
+// TODO(horoni): Fix weapon reach constants
+
+#define INSTANT_SPEED 10000.f
 
 void FAimbot::Aimbot()
 {
-	if(!g_Config.m_ClAimbot)
+	if(!g_Config.m_ShAim)
 		return;
 
-	// Get closest hook point into `m_TargetPos`
+	EWeapon Weapon;
+	if (m_pClient->m_Snap.m_pLocalCharacter)
+		Weapon = (EWeapon)m_pClient->m_Snap.m_pLocalCharacter->m_Weapon;
+	else return;
 
-	//HookVisible(m_TargetPos);
-	if(Controls()->m_aInputData[LOCAL].m_Hook == 1 && g_Config.m_ClAimbotHook)
+	if (g_Config.m_ShAimLaserAuto && Weapon == EWeapon::Laser)
 	{
-		GetClosestHitpoint(TOOL::Hook);
+		GetClosestHitpoint(EWeapon::Laser);
 		Aim(NormalizeAim(m_TargetPos));
+		Controls()->m_aInputData[LOCAL].m_Fire = 1;
 	}
-	else if (Controls()->m_aInputData[LOCAL].m_Fire % 2 == 1)
-	{
-		TOOL SelectedWeapon;
-		if (m_pClient->m_Snap.m_pLocalCharacter)
-			SelectedWeapon = (TOOL)(m_pClient->m_Snap.m_pLocalCharacter->m_Weapon + 1);
-		else return;
 
-		if (g_Config.m_ClShikonDbg) {
+	if(Controls()->m_aInputData[LOCAL].m_Hook == 1 && g_Config.m_ShAimHook)
+	{
+		GetClosestHitpoint(EWeapon::Hook);
+		Aim(NormalizeAim(m_TargetPos));
+	} else if (Controls()->m_aInputData[LOCAL].m_Fire % 2 == 1)
+	{
+		if (g_Config.m_ShAimLaserAuto && Weapon == EWeapon::Laser)
+			return;
+
+		GetClosestHitpoint(Weapon);
+
+		if (g_Config.m_ShDbg) {
 			fHelper->dbg_msg("bot", "bot: fire = %d; cursor w = %d; snap w = %d",
-          Controls()->m_aInputData[LOCAL].m_Fire,
-          m_pClient->m_CursorInfo.Weapon(),
-          m_pClient->m_Snap.m_pLocalCharacter ? 
-            m_pClient->m_Snap.m_pLocalCharacter->m_Weapon : -1
-      );
+				Controls()->m_aInputData[LOCAL].m_Fire,
+				m_pClient->m_CursorInfo.Weapon(),
+				m_pClient->m_Snap.m_pLocalCharacter ?
+				m_pClient->m_Snap.m_pLocalCharacter->m_Weapon : -1
+			);
+			fHelper->dbg_msg("bot", "bot: closest_hitpoint = %f %f",
+				m_TargetPos.x, m_TargetPos.y);
 		}
 
-		if (SelectedWeapon == TOOL::Laser && g_Config.m_ClAimbotLaser)
-			GetClosestHitpoint(SelectedWeapon);
-
-		// TODO(horoni): do not aim if no weapon aimbot is enabled
-		Aim(NormalizeAim(m_TargetPos));
+		if ( (Weapon == EWeapon::Hammer && g_Config.m_ShAimHammer)
+			|| (Weapon == EWeapon::Gun && g_Config.m_ShAimGun)
+			|| (Weapon == EWeapon::Shotgun && g_Config.m_ShAimShotgun)
+			|| (Weapon == EWeapon::Grenade && g_Config.m_ShAimGrenade)
+			|| (Weapon == EWeapon::Laser && g_Config.m_ShAimLaser)
+		) {
+			Aim(NormalizeAim(m_TargetPos));
+		}
 	}
 	else
 		m_CanAim = true;
@@ -47,7 +77,7 @@ void FAimbot::HookVisible(vec2 TargetPos)
 	static bool s_HasHooked = false;
 
 	// Reset input if needed and return
-	if(!g_Config.m_ClAimbotHookVisible)
+	if(!g_Config.m_ShAimHookVisible)
 	{
 		if(s_HasHooked)
 		{
@@ -76,20 +106,37 @@ void FAimbot::HookVisible(vec2 TargetPos)
 }
 
 
-// Gets
-void FAimbot::GetClosestHitpoint(TOOL Tool)
+void FAimbot::GetClosestHitpoint(EWeapon Weapon)
 {
-	switch(Tool) {
-		case TOOL::Hook:
-			m_TargetId = GetClosestId(g_Config.m_ClAimbotHookFov);
+	switch(Weapon) {
+		case EWeapon::Hook:
+			m_TargetId = GetClosestId(g_Config.m_ShAimHookFov);
 			break;
-		case TOOL::Laser:
-			m_TargetId = GetClosestId(g_Config.m_ClAimbotLaserFov, 815.f);
+		case EWeapon::Hammer:
+			m_TargetId = GetClosestId(g_Config.m_ShAimHammerFov, 21.f);
+			break;
+		case EWeapon::Gun:
+			m_TargetId = GetClosestId(g_Config.m_ShAimGunFov, 815.f);
+			break;
+		case EWeapon::Shotgun:
+			if (m_pClient->m_GameWorld.m_WorldConfig.m_IsDDRace)
+				m_TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, Tuning()->m_LaserReach + 15.f);
+			else m_TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, 415.f);
+			break;
+		case EWeapon::Grenade:
+			// TODO(horoni): Implement grenade prediction
+			m_TargetId = GetClosestId(g_Config.m_ShAimGrenadeFov, 1.f);
+			break;
+		case EWeapon::Laser:
+			// Range is shorter than 815 but we predicting
+			m_TargetId = GetClosestId(g_Config.m_ShAimLaserFov, Tuning()->m_LaserReach + 15.f);
 			break;
 	}
 
 	if(!fHelper->IsValidId(m_TargetId))
 	{
+		if (g_Config.m_ShDbg)
+			fHelper->dbg_msg("bot", "bot: InvalidClosestID");
 		m_TargetPos = vec2(0.f, 0.f);
 		m_TargetVel = vec2(0, 0);
 		m_TargetVisible = false;
@@ -97,11 +144,13 @@ void FAimbot::GetClosestHitpoint(TOOL Tool)
 		return;
 	}
 
+	if (g_Config.m_ShDbg)
+		fHelper->dbg_msg("bot", "bot: ValidClosestID");
 	m_MyPos = m_pClient->m_PredictedChar.m_Pos;
 	m_MyVel = m_pClient->m_PredictedChar.m_Vel;
 	m_TargetPos = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Pos;
 	m_TargetVel = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Vel;
-	m_TargetPos = EdgeScan(Tool);
+	m_TargetPos = EdgeScan(Weapon);
 }
 
 int FAimbot::GetClosestId(int Fov, float Range)
@@ -135,12 +184,22 @@ int FAimbot::GetClosestId(int Fov, float Range)
 
 		if(!InFov(Fov, Position - Pos))
 			continue;
+
+		// FNG: Skip if Tee is frozen and current weapon is Laser
+		if((m_pClient->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng)
+				&& m_pClient->m_Snap.m_pLocalCharacter->m_Weapon == (int)EWeapon::Laser
+				&& m_pClient->m_aClients[i].m_LiveFrozen)
+				continue;
+
 		if(ClosestID != -1 && GameWorld()->m_GameTick % 150 != 0)
 			return ClosestID;
+
+		// FIX?: Only if Weapon is Hook?
 		static int s_LastHookedId = m_pClient->m_Snap.m_pLocalCharacter->m_HookedPlayer;
-		if(fHelper->IsValidId(s_LastHookedId) &&
-			length(m_pClient->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < Tuning()->m_HookLength + PHYS_SIZE * 0.5f)
+		if(fHelper->IsValidId(s_LastHookedId)
+				&& length(m_pClient->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < Tuning()->m_HookLength + PHYS_SIZE * 0.5f)
 			return ClosestID;
+
 		if(ClosestID == -1 && distance(Pos, Position) < Distance)
 		{
 			ClosestID = i;
@@ -157,26 +216,41 @@ float FAimbot::GetPing() const
 	return Ping;
 }
 
-
 // <><><> Helpers <><><><><>
 
-bool FAimbot::PredictTool(TOOL Tool, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel)
+bool FAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel)
 {
 	const vec2 Delta = TargetPos - MyPos;
 	const vec2 DeltaVel = TargetVel - MyVel;
 
-	float ToolFireSpeed;
-	switch(Tool) {
-		case TOOL::Hook:
-			ToolFireSpeed = Tuning()->m_HookFireSpeed;
+	float WSpeed;
+	switch(Weapon) {
+		case EWeapon::Hook:
+			WSpeed = Tuning()->m_HookFireSpeed;
 			break;
-		case TOOL::Laser:
-			ToolFireSpeed = Tuning()->m_ShotgunSpeed;
+		case EWeapon::Hammer:
+			WSpeed = INSTANT_SPEED;
+			break;
+		case EWeapon::Gun:
+			WSpeed = Tuning()->m_GunSpeed;
+			break;
+		case EWeapon::Shotgun:
+			// TODO(horoni): Maybe there is a better way to detect shotgun mode? 
+			if (m_pClient->m_GameWorld.m_WorldConfig.m_IsDDRace)
+				WSpeed = INSTANT_SPEED;
+			else WSpeed = Tuning()->m_ShotgunSpeed;
+			break;
+		case EWeapon::Grenade:
+			return false;
+			break;
+		case EWeapon::Laser:
+			WSpeed = INSTANT_SPEED;
 			break;
 	}
 
-	const float ToolSpeed = length(TargetVel) + ToolFireSpeed;
-	const float a = dot(DeltaVel, DeltaVel) - powf(ToolSpeed, 2);
+	const float WeaponSpeed = length(TargetVel) + WSpeed;
+	const float a = dot(DeltaVel, DeltaVel) - powf(WeaponSpeed, 2);
+
 	const float b = 2.f * dot(DeltaVel, Delta);
 	const float c = dot(Delta, Delta);
 
@@ -193,24 +267,47 @@ bool FAimbot::PredictTool(TOOL Tool, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, v
 }
 
 
-bool FAimbot::HitScanTool(TOOL Tool, vec2 InitPos, vec2 TargetPos, vec2 ScanDir)
+bool FAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir)
 {
-	float ToolFireSpeed;
-	float ToolLength;
+	float WSpeed;
+	float WReach;
 
-	switch(Tool) {
-		case TOOL::Hook:
-			ToolFireSpeed = Tuning()->m_HookFireSpeed;
-			ToolLength = Tuning()->m_HookLength;
+	switch(Weapon) {
+		case EWeapon::Hook:
+			WSpeed = Tuning()->m_HookFireSpeed;
+			WReach = Tuning()->m_HookLength;
 			break;
-		case TOOL::Laser:
-			ToolFireSpeed = Tuning()->m_ShotgunSpeed;
-			ToolLength = Tuning()->m_LaserReach;
+		case EWeapon::Hammer:
+			// FIX: Hammer reach
+			WSpeed = INSTANT_SPEED;
+			WReach = 20.f; // I dont know how much really
+		case EWeapon::Gun:
+			// FIX: Gun reach
+			WSpeed = Tuning()->m_GunSpeed;
+			WReach = 800.f;
+			break;
+		case EWeapon::Shotgun:
+			// TODO(horoni): Maybe there is a better way to detect shotgun mode? 
+			if (m_pClient->m_GameWorld.m_WorldConfig.m_IsDDRace) {
+				WSpeed = INSTANT_SPEED;
+				WReach = Tuning()->m_LaserReach;
+			} else {
+				// FIX?: Reach distance
+				WSpeed = Tuning()->m_ShotgunSpeed;
+				WReach = 400.f;
+			}
+			break;
+		case EWeapon::Grenade:
+			return false;
+			break;
+		case EWeapon::Laser:
+			WSpeed = INSTANT_SPEED;
+			WReach = Tuning()->m_LaserReach;
 			break;
 	}
 
 	vec2 ExDirection = normalize(ScanDir);
-	vec2 FinishPos = InitPos + ExDirection * (ToolLength - PHYS_SIZE * 1.5f);
+	vec2 FinishPos = InitPos + ExDirection * (WReach - PHYS_SIZE * 1.5f);
 
 	vec2 OldPos = InitPos + ExDirection * PHYS_SIZE * 1.5f;
 	vec2 NewPos = OldPos;
@@ -220,14 +317,15 @@ bool FAimbot::HitScanTool(TOOL Tool, vec2 InitPos, vec2 TargetPos, vec2 ScanDir)
 	do
 	{
 		OldPos = NewPos;
-		NewPos = OldPos + ExDirection * ToolFireSpeed;
+		NewPos = OldPos + ExDirection * WSpeed;
 
-		if(distance(InitPos, NewPos) > ToolLength)
+		if(distance(InitPos, NewPos) > WReach)
 		{
-			NewPos = InitPos + normalize(NewPos - InitPos) * ToolLength;
+			NewPos = InitPos + normalize(NewPos - InitPos) * WReach;
 			DoBreak = true;
 		}
 
+		// TODO(horoni): Can it be used with any weapon?
 		int TeleNr = 0;
 		const int Hit = Collision()->IntersectLineTeleHook(OldPos, NewPos, &FinishPos, nullptr, &TeleNr);
 
@@ -263,7 +361,6 @@ bool FAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 	return false;
 }
 
-
 // Aim
 vec2 FAimbot::NormalizeAim(vec2 Pos)
 {
@@ -290,7 +387,7 @@ void FAimbot::Aim(vec2 Pos)
 		return;
 
 	// Aim using desired way
-	if(!g_Config.m_ClAimbotSilent)
+	if(!g_Config.m_ShAimSilent)
 	{
 		Controls()->m_aMousePos[LOCAL] = Pos;
 		Controls()->m_aInputData[LOCAL].m_TargetX = static_cast<int>(Controls()->m_aMousePos[LOCAL].x);
@@ -303,12 +400,10 @@ void FAimbot::Aim(vec2 Pos)
 	}
 }
 
-
-// Check
 bool FAimbot::InFov(float Fov, vec2 Dir)
 {
 	const float DifferenceAngle = abs(atan2(sin(angle(Dir) - angle(Controls()->m_aMousePos[LOCAL])),
-		                              cos(angle(Dir) - angle(Controls()->m_aMousePos[LOCAL])))) * 100.f;
+		cos(angle(Dir) - angle(Controls()->m_aMousePos[LOCAL])))) * 100.f;
 	if(DifferenceAngle > Fov)
 		return false;
 	return true;

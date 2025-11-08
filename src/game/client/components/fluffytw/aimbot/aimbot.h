@@ -3,13 +3,13 @@
 #include "game/client/components/fluffytw/f_component.h"
 #include <game/client/gameclient.h>
 
-enum class TOOL {
-	Hook = 0,
-	Hammer = 1,
-	Gun = 2,
-	Shotgun = 3,
-	Grenade = 4,
-	Laser = 5,
+enum class EWeapon {
+	Hammer = 0,
+	Gun = 1,
+	Shotgun = 2,
+	Grenade = 3,
+	Laser = 4,
+	Hook = 5,
 };
 
 class FAimbot : public FComponent
@@ -22,17 +22,17 @@ public:
 	void HookVisible(vec2 TargetPos);
 
 	// Gets
-	void GetClosestHitpoint(TOOL Tool);
+	void GetClosestHitpoint(EWeapon Weapon);
 	int GetClosestId(int Fov = 360, float Range = 395.f);
 	[[nodiscard]] float GetPing() const;
 
 	// Helpers
-	bool PredictTool(TOOL Tool, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel);
-	bool HitScanTool(TOOL Tool, vec2 InitPos, vec2 TargetPos, vec2 ScanDir);
+	bool PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel);
+	bool HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir);
 	bool IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos);
 
 	// Scans
-	vec2 EdgeScan(TOOL Tool);
+	vec2 EdgeScan(EWeapon Weapon);
 
 	// Aim
 	vec2 NormalizeAim(vec2 Pos);

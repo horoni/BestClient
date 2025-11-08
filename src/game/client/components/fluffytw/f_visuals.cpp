@@ -1,9 +1,10 @@
+#include "aimbot/aimbot.h"
 #include "f_helper.h"
 #include "f_visuals.h"
 
 void FVisuals::Run(int ClientID, float Angle, vec2 Position)
 {
-	if(!g_Config.m_ClEsp)
+	if(!g_Config.m_ShEsp)
 		return;
 	Graphics()->TextureClear();
 	DrawFov();
@@ -11,30 +12,30 @@ void FVisuals::Run(int ClientID, float Angle, vec2 Position)
 
 void FVisuals::DrawFov()
 {
-	if(g_Config.m_ClEspHookFov)
-		DrawFovF(g_Config.m_ClAimbotHookFov, g_Config.m_ClEspHookFovCol);
+	if(g_Config.m_ShEspHookFov)
+		DrawFovF(g_Config.m_ShAimHookFov, g_Config.m_ShEspHookFovCol);
 
-	if(g_Config.m_ClEspWeaponFov) {
-		int SelectedWeapon;
+	if(g_Config.m_ShEspWeaponFov) {
+		EWeapon Weapon;
 		if (m_pClient->m_Snap.m_pLocalCharacter)
-			SelectedWeapon = m_pClient->m_Snap.m_pLocalCharacter->m_Weapon;
+			Weapon = (EWeapon)m_pClient->m_Snap.m_pLocalCharacter->m_Weapon;
 		else return;
 
-		switch (SelectedWeapon) {
-			case 0:
-				DrawFovF(g_Config.m_ClAimbotHammerFov, g_Config.m_ClEspWeaponFovCol);
+		switch (Weapon) {
+			case EWeapon::Hammer:
+				DrawFovF(g_Config.m_ShAimHammerFov, g_Config.m_ShEspWeaponFovCol);
 				break;
-			case 1:
-				DrawFovF(g_Config.m_ClAimbotGunFov, g_Config.m_ClEspWeaponFovCol);
+			case EWeapon::Gun:
+				DrawFovF(g_Config.m_ShAimGunFov, g_Config.m_ShEspWeaponFovCol);
 				break;
-			case 2:
-				DrawFovF(g_Config.m_ClAimbotShotgunFov, g_Config.m_ClEspWeaponFovCol);
+			case EWeapon::Shotgun:
+				DrawFovF(g_Config.m_ShAimShotgunFov, g_Config.m_ShEspWeaponFovCol);
 				break;
-			case 3:
-				DrawFovF(g_Config.m_ClAimbotGrenadeFov, g_Config.m_ClEspWeaponFovCol);
+			case EWeapon::Grenade:
+				DrawFovF(g_Config.m_ShAimGrenadeFov, g_Config.m_ShEspWeaponFovCol);
 				break;
-			case 4:
-				DrawFovF(g_Config.m_ClAimbotLaserFov, g_Config.m_ClEspWeaponFovCol);
+			case EWeapon::Laser:
+				DrawFovF(g_Config.m_ShAimLaserFov, g_Config.m_ShEspWeaponFovCol);
 				break;
 		}
 	}

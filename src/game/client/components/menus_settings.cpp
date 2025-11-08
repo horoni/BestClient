@@ -3198,7 +3198,7 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	CUIRect Column, LeftView, RightView, Button, Label;
 
 	const float LineSize = 20.0f;
-  const float ColorPickerLineSize = 25.0f;
+	const float ColorPickerLineSize = 25.0f;
 	const float HeadlineFontSize = 20.0f;
 
 	const float HeadlineHeight = HeadlineFontSize + 0.0f;
@@ -3208,8 +3208,8 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	const float MarginBetweenSections = 30.0f;
 	const float MarginBetweenViews = 30.0f;
 
-  const float ColorPickerLabelSize = 13.0f;
-  const float ColorPickerLineSpacing = 5.0f;
+	const float ColorPickerLabelSize = 13.0f;
+	const float ColorPickerLineSpacing = 5.0f;
 
 	static CScrollRegion s_ScrollRegion;
 	vec2 ScrollOffset(0.0f, 0.0f);
@@ -3254,13 +3254,14 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	Ui()->DoLabel(&Label, "Aimbot", HeadlineFontSize, TEXTALIGN_ML);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbot, ("Enable"), &g_Config.m_ClAimbot, &Column, LineSize);
-	if (g_Config.m_ClAimbot)
-		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotSilent, ("Silent"), &g_Config.m_ClAimbotSilent, &Column, LineSize);
-	else
-		Column.HSplitTop(LineSize, nullptr, &Column);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAim, ("Enable"), &g_Config.m_ShAim, &Column, LineSize);
+	if (g_Config.m_ShAim) {
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimSilent, ("Silent"), &g_Config.m_ShAimSilent, &Column, LineSize);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimForceFng, ("Force FNG mode"), &g_Config.m_ShAimForceFng, &Column, LineSize);
+	} else
+		Column.HSplitTop(LineSize * 2, nullptr, &Column);
 
-	if (g_Config.m_ClAimbot)
+	if (g_Config.m_ShAim)
 	{
 		static int s_SelectedWeapon = 0;
 		static std::vector<const char *> s_WeaponDropDownNames;
@@ -3268,42 +3269,43 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 		static CUi::SDropDownState s_WeaponDropDownState;
 		static CScrollRegion s_WeaponDropDownScrollRegion;
 		s_WeaponDropDownState.m_SelectionPopupContext.m_pScrollRegion = &s_WeaponDropDownScrollRegion;
-		int WeaponSelectedOld = s_SelectedWeapon /* - 1*/ ;
+		int WeaponSelectedOld = s_SelectedWeapon;
 		CUIRect WeaponDropDownRect;
 		Column.HSplitTop(LineSize, &WeaponDropDownRect, &Column);
 		const int WeaponSelectedNew = Ui()->DoDropDown(&WeaponDropDownRect, WeaponSelectedOld, s_WeaponDropDownNames.data(), s_WeaponDropDownNames.size(), s_WeaponDropDownState);
 		if(WeaponSelectedOld != WeaponSelectedNew)
 		{
-			s_SelectedWeapon = WeaponSelectedNew /* + 1*/;
+			s_SelectedWeapon = WeaponSelectedNew;
 		}
 
 		if (s_SelectedWeapon == 0) { // Hook
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHook, ("Aimbot"), &g_Config.m_ClAimbotHook, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHook, ("Aimbot"), &g_Config.m_ShAimHook, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHookFov, &g_Config.m_ClAimbotHookFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookEdge, ("Hook Edge Scan"), &g_Config.m_ClAimbotHookEdge, &Column, LineSize);
+			Ui()->DoScrollbarOption(&g_Config.m_ShAimHookFov, &g_Config.m_ShAimHookFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHookEdge, ("Hook Edge Scan"), &g_Config.m_ShAimHookEdge, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHookEdgeAccuracy, &g_Config.m_ClAimbotHookEdgeAccuracy, &Button, ("Accuracy"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
+			Ui()->DoScrollbarOption(&g_Config.m_ShAimHookEdgeAccuracy, &g_Config.m_ShAimHookEdgeAccuracy, &Button, ("Accuracy"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
 		} else if (s_SelectedWeapon == 1) { // Hammer
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHammer, ("Aimbot"), &g_Config.m_ClAimbotHammer, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHammer, ("Aimbot"), &g_Config.m_ShAimHammer, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotHammerFov, &g_Config.m_ClAimbotHammerFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+			Ui()->DoScrollbarOption(&g_Config.m_ShAimHammerFov, &g_Config.m_ShAimHammerFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
 		} else if (s_SelectedWeapon == 2) { // Gun
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotGun, ("Aimbot"), &g_Config.m_ClAimbotGun, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimGun, ("Aimbot"), &g_Config.m_ShAimGun, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotGunFov, &g_Config.m_ClAimbotGunFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+			Ui()->DoScrollbarOption(&g_Config.m_ShAimGunFov, &g_Config.m_ShAimGunFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
 		} else if (s_SelectedWeapon == 3) { // Shotgun
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotShotgun, ("Aimbot"), &g_Config.m_ClAimbotShotgun, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimShotgun, ("Aimbot"), &g_Config.m_ShAimShotgun, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotShotgunFov, &g_Config.m_ClAimbotShotgunFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+			Ui()->DoScrollbarOption(&g_Config.m_ShAimShotgunFov, &g_Config.m_ShAimShotgunFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
 		} else if (s_SelectedWeapon == 4) { // Grenade
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotGrenade, ("Aimbot"), &g_Config.m_ClAimbotGrenade, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimGrenade, ("Aimbot"), &g_Config.m_ShAimGrenade, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotGrenadeFov, &g_Config.m_ClAimbotGrenadeFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+			Ui()->DoScrollbarOption(&g_Config.m_ShAimGrenadeFov, &g_Config.m_ShAimGrenadeFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
 		} else if (s_SelectedWeapon == 5) { // Laser
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotLaser, ("Aimbot"), &g_Config.m_ClAimbotLaser, &Column, LineSize);
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimLaser, ("Aimbot"), &g_Config.m_ShAimLaser, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_ClAimbotLaserFov, &g_Config.m_ClAimbotLaserFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+			Ui()->DoScrollbarOption(&g_Config.m_ShAimLaserFov, &g_Config.m_ShAimLaserFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
+			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimLaserAuto, ("Auto"), &g_Config.m_ShAimLaserAuto, &Column, LineSize);
 		}
 	}
 
@@ -3317,16 +3319,16 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	Ui()->DoLabel(&Label, "Other", HeadlineFontSize, TEXTALIGN_ML);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClShikonDbg, ("Debug"), &g_Config.m_ClShikonDbg, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEsp, ("ESP"), &g_Config.m_ClEsp, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspHookFov, ("Draw Hook FOV"), &g_Config.m_ClEspHookFov, &Column, LineSize);
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClEspWeaponFov, ("Draw Weapon FOV"), &g_Config.m_ClEspWeaponFov, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShDbg, ("Debug"), &g_Config.m_ShDbg, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEsp, ("ESP"), &g_Config.m_ShEsp, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspHookFov, ("Draw Hook FOV"), &g_Config.m_ShEspHookFov, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspWeaponFov, ("Draw Weapon FOV"), &g_Config.m_ShEspWeaponFov, &Column, LineSize);
 
 	static CButtonContainer s_HookFovColorId, s_WeaponFovColorId;
-	DoLine_ColorPicker(&s_HookFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Hook FOV Color"), &g_Config.m_ClEspHookFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
-	DoLine_ColorPicker(&s_WeaponFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Weapon FOV Color"), &g_Config.m_ClEspWeaponFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
+	DoLine_ColorPicker(&s_HookFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Hook FOV Color"), &g_Config.m_ShEspHookFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
+	DoLine_ColorPicker(&s_WeaponFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Weapon FOV Color"), &g_Config.m_ShEspWeaponFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
 
-	//DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ClAimbotHookVisible, ("Hook visible"), &g_Config.m_ClAimbotHookVisible, &Column, LineSize);
+	//DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHookVisible, ("Hook visible"), &g_Config.m_ShAimHookVisible, &Column, LineSize);
 
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
