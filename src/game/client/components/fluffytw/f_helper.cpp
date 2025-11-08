@@ -26,52 +26,6 @@ void FHelper::TickPredict(CNetObj_Character *pCharacter, int t, vec2 *m_pPosArra
 	}
 }
 
-
-int FHelper::GetClosestId(int fov, float range)
-{
-	const vec2 Pos = m_pClient->m_PredictedChar.m_Pos;
-	float Distance = range;
-	int ClosestID = -1;
-
-	const CGameClient::CClientData OwnClientData = m_pClient->m_aClients[LOCAL_ID];
-
-	auto *player = dynamic_cast<CCharacter *>(m_pClient->m_GameWorld.FindFirst(m_pClient->m_GameWorld.ENTTYPE_CHARACTER));
-	for(; player; player = dynamic_cast<CCharacter *>(player->TypeNext()))
-	{
-		int i = player->GetId();
-		if(i == LOCAL_ID || !player)
-			continue;
-
-		const CGameClient::CClientData cData = m_pClient->m_aClients[i];
-		if(!cData.m_Active)
-			continue;
-		vec2 Position = m_pClient->m_aClients[i].m_Predicted.m_Pos;
-
-		const bool IsOneSolo = cData.m_Solo || OwnClientData.m_Solo;
-		const bool IsOneSpec = cData.m_Spec || OwnClientData.m_Spec;
-
-		if(IsOneSpec || IsOneSolo)
-			continue;
-
-		if(!m_pClient->m_Teams.SameTeam(i, LOCAL_ID) || OwnClientData.m_HookHitDisabled)
-			continue;
-
-		if(!m_pAimbot->InFov(fov, Position - Pos))
-			continue;
-		if(ClosestID != -1 && GameWorld()->m_GameTick % 150 != 0)
-			return ClosestID;
-		static int lastHookedId = m_pClient->m_Snap.m_pLocalCharacter->m_HookedPlayer;
-		if(IsValidId(lastHookedId) && length(m_pClient->m_aClients[lastHookedId].m_Predicted.m_Pos - cData.m_Predicted.m_Pos) < Tuning()->m_HookLength + PHYS_SIZE * 0.5f)
-			return ClosestID;
-		if(ClosestID == -1 && distance(Pos, Position) < Distance)
-		{
-			ClosestID = i;
-			Distance = distance(Pos, Position);
-		}
-	}
-	return ClosestID;
-}
-
 int FHelper::GetCustomTile(float x, float y) const
 {
 	if(!m_pClient->Collision()->GetTiles())
