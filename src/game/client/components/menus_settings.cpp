@@ -3328,8 +3328,6 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	DoLine_ColorPicker(&s_HookFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Hook FOV Color"), &g_Config.m_ShEspHookFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
 	DoLine_ColorPicker(&s_WeaponFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Weapon FOV Color"), &g_Config.m_ShEspWeaponFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
 
-	//DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHookVisible, ("Hook visible"), &g_Config.m_ShAimHookVisible, &Column, LineSize);
-
 	Column.HSplitTop(MarginExtraSmall, nullptr, &Column);
 	s_SectionBoxes.back().h = Column.y - s_SectionBoxes.back().y;
 

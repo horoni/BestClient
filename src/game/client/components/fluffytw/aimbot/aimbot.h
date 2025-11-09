@@ -19,7 +19,6 @@ public:
 		FComponent(pClient) {}
 
 	void Aimbot();
-	void HookVisible(vec2 TargetPos);
 
 	// Gets
 	void GetClosestHitpoint(EWeapon Weapon);

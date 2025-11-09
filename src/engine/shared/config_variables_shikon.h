@@ -21,8 +21,6 @@ MACRO_CONFIG_COL(ShEspWeaponFovCol, sh_esp_weapon_fov_col, 4294901760, CFGFLAG_C
 MACRO_CONFIG_INT(ShAim, sh_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Aimbot enable")
 MACRO_CONFIG_INT(ShAimSilent, sh_aim_silent, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Silent aimbot")
 MACRO_CONFIG_INT(ShAimForceFng, sh_aim_forcefng, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Force FNG Gamemode")
-//  Unused
-MACRO_CONFIG_INT(ShAimHookVisible, sh_aim_hookvisible, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hook visible")
 
 // <> Hook <>
 MACRO_CONFIG_INT(ShAimHook, sh_aim_hook, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hook Aimbot Enable")

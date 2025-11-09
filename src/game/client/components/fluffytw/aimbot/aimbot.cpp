@@ -57,41 +57,6 @@ void FAimbot::Aimbot()
 		m_CanAim = true;
 }
 
-void FAimbot::HookVisible(vec2 TargetPos)
-{
-	// Constant
-	static bool s_HasHooked = false;
-
-	// Reset input if needed and return
-	if(!g_Config.m_ShAimHookVisible)
-	{
-		if(s_HasHooked)
-		{
-			Controls()->m_aLastData[LOCAL].m_Hook = 0;
-			Controls()->m_aInputData[LOCAL].m_Hook = Controls()->m_aLastData[LOCAL].m_Hook;
-			s_HasHooked = false;
-		}
-		return;
-	}
-
-	// If target is not visible return
-	if(!m_TargetVisible)
-		return;
-
-	// Handle 'can aim' logic
-	m_CanAim = true;
-	if(s_HasHooked == true)
-		m_CanAim = false;
-
-	// Aim and hook
-	Aim(NormalizeAim(TargetPos));
-	Controls()->m_aInputData[LOCAL].m_Hook = 1;
-
-	// Hooked, so update `s_HasHooked`
-	s_HasHooked = true;
-}
-
-
 void FAimbot::GetClosestHitpoint(EWeapon Weapon)
 {
 	switch(Weapon) {
