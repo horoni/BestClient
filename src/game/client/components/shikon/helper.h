@@ -34,7 +34,7 @@ public:
 	std::unique_ptr<CSHAimbot>  m_pAimbot;
 	std::unique_ptr<CSHVisuals> m_pVisuals;
 
-	void TickPredict(CNetObj_Character *pCharacter, int t, vec2 *m_pPosArray);
+	void TickPredict(CNetObj_Character *pCharacter, int t, vec2 *aPositions);
 	int GetCustomTile(float x, float y) const;
 
 	bool IsLocalActive();

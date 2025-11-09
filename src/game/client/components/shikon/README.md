@@ -13,6 +13,7 @@ Hack based on [fluffytw](https://github.com/krxclient/fluffytw) hacking library
  - [ ] Implement grenade prediction
  - [ ] Auto Switch to Laser if `AutoLaser` enabled
  - [ ] Coordinates aligner (Walk to center of tile)
+ - [ ] ESP: Draw green and red dots with TickPredict() like KRX
 
 ### Refactor
  - [ ] Maybe there is a better way to detect shotgun mode?

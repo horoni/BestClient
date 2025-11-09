@@ -9,7 +9,7 @@ CSHHelper::CSHHelper(CGameClient *Client) noexcept
 	m_pAimbot(std::make_unique<CSHAimbot>(Client)),
 	m_pVisuals(std::make_unique<CSHVisuals>(Client)) {}
 
-void CSHHelper::TickPredict(CNetObj_Character *pCharacter, int t, vec2 *m_pPosArray)
+void CSHHelper::TickPredict(CNetObj_Character *pCharacter, int t, vec2 *aPositions)
 {
 	CWorldCore TmpWorld;
 	auto TmpCore = CCharacterCore();
@@ -21,7 +21,7 @@ void CSHHelper::TickPredict(CNetObj_Character *pCharacter, int t, vec2 *m_pPosAr
 	{
 		TmpCore.Tick(false);
 		TmpCore.Move();
-		m_pPosArray[i] = TmpCore.m_Pos + TmpCore.m_Vel;
+		aPositions[i] = TmpCore.m_Pos + TmpCore.m_Vel;
 	}
 }
 
