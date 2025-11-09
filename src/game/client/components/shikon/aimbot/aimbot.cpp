@@ -1,11 +1,11 @@
-﻿#include "game/client/prediction/entities/character.h"
-#include "game/client/components/fluffytw/f_helper.h"
-#include <game/client/components/fluffytw/f_component.h>
-#include "aimbot.h"
+﻿#include "game/client/components/shikon/aimbot/aimbot.h"
+#include "game/client/components/shikon/component.h"
+#include "game/client/components/shikon/helper.h"
+#include "game/client/prediction/entities/character.h"
 
 #define INSTANT_SPEED 10000.f
 
-void FAimbot::Aimbot()
+void CSHAimbot::Aimbot()
 {
 	if(!g_Config.m_ShAim)
 		return;
@@ -34,13 +34,13 @@ void FAimbot::Aimbot()
 		GetClosestHitpoint(Weapon);
 
 		if (g_Config.m_ShDbg) {
-			fHelper->dbg_msg("bot", "bot: fire = %d; cursor w = %d; snap w = %d",
+			shHelper->dbg_msg("bot", "bot: fire = %d; cursor w = %d; snap w = %d",
 				Controls()->m_aInputData[LOCAL].m_Fire,
 				m_pClient->m_CursorInfo.Weapon(),
 				m_pClient->m_Snap.m_pLocalCharacter ?
 				m_pClient->m_Snap.m_pLocalCharacter->m_Weapon : -1
 			);
-			fHelper->dbg_msg("bot", "bot: closest_hitpoint = %f %f",
+			shHelper->dbg_msg("bot", "bot: closest_hitpoint = %f %f",
 				m_TargetPos.x, m_TargetPos.y);
 		}
 
@@ -57,7 +57,7 @@ void FAimbot::Aimbot()
 		m_CanAim = true;
 }
 
-void FAimbot::GetClosestHitpoint(EWeapon Weapon)
+void CSHAimbot::GetClosestHitpoint(EWeapon Weapon)
 {
 	switch(Weapon) {
 		case EWeapon::Hook:
@@ -84,10 +84,10 @@ void FAimbot::GetClosestHitpoint(EWeapon Weapon)
 			break;
 	}
 
-	if(!fHelper->IsValidId(m_TargetId))
+	if(!shHelper->IsValidId(m_TargetId))
 	{
 		if (g_Config.m_ShDbg)
-			fHelper->dbg_msg("bot", "bot: InvalidClosestID");
+			shHelper->dbg_msg("bot", "bot: InvalidClosestID");
 		m_TargetPos = vec2(0.f, 0.f);
 		m_TargetVel = vec2(0, 0);
 		m_TargetVisible = false;
@@ -96,7 +96,7 @@ void FAimbot::GetClosestHitpoint(EWeapon Weapon)
 	}
 
 	if (g_Config.m_ShDbg)
-		fHelper->dbg_msg("bot", "bot: ValidClosestID");
+		shHelper->dbg_msg("bot", "bot: ValidClosestID");
 	m_MyPos = m_pClient->m_PredictedChar.m_Pos;
 	m_MyVel = m_pClient->m_PredictedChar.m_Vel;
 	m_TargetPos = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Pos;
@@ -104,7 +104,7 @@ void FAimbot::GetClosestHitpoint(EWeapon Weapon)
 	m_TargetPos = EdgeScan(Weapon);
 }
 
-int FAimbot::GetClosestId(int Fov, float Range)
+int CSHAimbot::GetClosestId(int Fov, float Range)
 {
 	const vec2 Pos = m_pClient->m_PredictedChar.m_Pos;
 	float Distance = Range;
@@ -147,7 +147,7 @@ int FAimbot::GetClosestId(int Fov, float Range)
 
 		// FIX?: Only if Weapon is Hook?
 		static int s_LastHookedId = m_pClient->m_Snap.m_pLocalCharacter->m_HookedPlayer;
-		if(fHelper->IsValidId(s_LastHookedId)
+		if(shHelper->IsValidId(s_LastHookedId)
 				&& length(m_pClient->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < Tuning()->m_HookLength + PHYS_SIZE * 0.5f)
 			return ClosestID;
 
@@ -160,7 +160,7 @@ int FAimbot::GetClosestId(int Fov, float Range)
 	return ClosestID;
 }
 
-float FAimbot::GetPing() const
+float CSHAimbot::GetPing() const
 {
 	const auto RealPing = static_cast<float>(Client()->GetPredictionTime());
 	const float Ping = RealPing / 100.f;
@@ -169,7 +169,7 @@ float FAimbot::GetPing() const
 
 // <><><> Helpers <><><><><>
 
-bool FAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel)
+bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel)
 {
 	const vec2 Delta = TargetPos - MyPos;
 	const vec2 DeltaVel = TargetVel - MyVel;
@@ -218,7 +218,7 @@ bool FAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Targe
 }
 
 
-bool FAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir)
+bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir)
 {
 	float WSpeed;
 	float WReach;
@@ -298,7 +298,7 @@ bool FAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 S
 	return false;
 }
 
-bool FAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
+bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 {
 	vec2 ClosestPoint;
 	if(closest_point_on_line(HookPos, NewPos, TargetPos, ClosestPoint))
@@ -313,7 +313,7 @@ bool FAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 }
 
 // Aim
-vec2 FAimbot::NormalizeAim(vec2 Pos)
+vec2 CSHAimbot::NormalizeAim(vec2 Pos)
 {
 	constexpr float CameraMaxDistance = 200.f;
 	const float FollowFactor = (g_Config.m_ClDyncam ? g_Config.m_ClDyncamFollowFactor : g_Config.m_ClMouseFollowfactor) / 100.f;
@@ -326,7 +326,7 @@ vec2 FAimbot::NormalizeAim(vec2 Pos)
 	return Pos;
 }
 
-void FAimbot::Aim(vec2 Pos)
+void CSHAimbot::Aim(vec2 Pos)
 {
 	if(!m_CanAim)
 		return;
@@ -351,7 +351,7 @@ void FAimbot::Aim(vec2 Pos)
 	}
 }
 
-bool FAimbot::InFov(float Fov, vec2 Dir)
+bool CSHAimbot::InFov(float Fov, vec2 Dir)
 {
 	const float DifferenceAngle = abs(atan2(sin(angle(Dir) - angle(Controls()->m_aMousePos[LOCAL])),
 		cos(angle(Dir) - angle(Controls()->m_aMousePos[LOCAL])))) * 100.f;

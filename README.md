@@ -11,7 +11,7 @@
 
 ## About
 ### Shikon Client
-[README](src/game/client/components/fluffytw/README.md)
+[README](src/game/client/components/shikon/README.md)
 
 ### BestClient
 

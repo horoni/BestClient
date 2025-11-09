@@ -32,7 +32,7 @@
 #include <game/client/prediction/entities/character.h>
 
 // shikon
-#include "fluffytw/f_helper.h"
+#include "shikon/helper.h"
 
 static float CalculateHandAngle(vec2 Dir, float AngleOffset)
 {
@@ -1196,7 +1196,7 @@ void CPlayers::RenderPlayer(
 		}
 	}
 	// shikon
-	fHelper->m_pVisuals->Run(ClientId, Angle, Position);
+	shHelper->m_pVisuals->Run(ClientId, Angle, Position);
 }
 
 // TClient: TODO remove this

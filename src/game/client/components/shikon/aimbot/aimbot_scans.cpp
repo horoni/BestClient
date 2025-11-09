@@ -1,7 +1,7 @@
-#include "aimbot.h"
-#include "game/client/components/fluffytw/f_helper.h"
+#include "game/client/components/shikon/aimbot/aimbot.h"
+#include "game/client/components/shikon/helper.h"
 
-vec2 FAimbot::EdgeScan(EWeapon Weapon)
+vec2 CSHAimbot::EdgeScan(EWeapon Weapon)
 {
 	int HitPointsCount = 0;
 	vec2 HitPoints[MAX_HITPOINTS];

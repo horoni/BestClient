@@ -1,6 +1,6 @@
- #pragma once
+#pragma once
 
-#include "game/client/gameclient.h"
+#include <game/client/gameclient.h>
 
 #define LOCAL g_Config.m_ClDummy
 #define LOCAL_ID m_pClient->m_aLocalIds[LOCAL]
@@ -11,12 +11,12 @@
 #define PHYS_SIZE 28.f
 #define MAX_HITPOINTS 32
 
-class FComponent
+class CSHComponent
 {
 public:
-	FComponent(CGameClient* pClient) :
+	CSHComponent(CGameClient* pClient) :
 		m_pClient(pClient){}
-	virtual ~FComponent() = default;
+	virtual ~CSHComponent() = default;
 
 protected:
 	// CGameClient pointer

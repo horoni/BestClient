@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/client/components/fluffytw/f_component.h"
+#include "game/client/components/shikon/component.h"
 #include <game/client/gameclient.h>
 
 enum class EWeapon {
@@ -12,11 +12,11 @@ enum class EWeapon {
 	Hook = 5,
 };
 
-class FAimbot : public FComponent
+class CSHAimbot : public CSHComponent
 {
 public:
-	FAimbot(CGameClient *pClient) :
-		FComponent(pClient) {}
+	CSHAimbot(CGameClient *pClient) :
+		CSHComponent(pClient) {}
 
 	void Aimbot();
 

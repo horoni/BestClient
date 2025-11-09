@@ -2715,17 +2715,6 @@ if(CLIENT)
     components/envelope_state.h
     components/flow.cpp
     components/flow.h
-    components/fluffytw/aimbot/aimbot.cpp
-    components/fluffytw/aimbot/aimbot.h
-    components/fluffytw/aimbot/aimbot_scans.cpp
-    components/fluffytw/f_bots.cpp
-    components/fluffytw/f_bots.h
-    components/fluffytw/f_component.h
-    components/fluffytw/f_helper.cpp
-    components/fluffytw/f_helper.h
-    components/fluffytw/f_visuals-base.cpp
-    components/fluffytw/f_visuals.cpp
-    components/fluffytw/f_visuals.h
     components/freezebars.cpp
     components/freezebars.h
     components/ghost.cpp
@@ -2785,6 +2774,16 @@ if(CLIENT)
     components/race_demo.h
     components/scoreboard.cpp
     components/scoreboard.h
+    components/shikon/aimbot/aimbot.cpp
+    components/shikon/aimbot/aimbot.h
+    components/shikon/aimbot/aimbot_scans.cpp
+    components/shikon/bots.cpp
+    components/shikon/bots.h
+    components/shikon/component.h
+    components/shikon/helper.cpp
+    components/shikon/helper.h
+    components/shikon/visuals.cpp
+    components/shikon/visuals.h
     components/skins.cpp
     components/skins.h
     components/skins7.cpp

@@ -1,14 +1,14 @@
 #pragma once
 
-#include <memory>
-
-#include <game/client/components/fluffytw/f_bots.h>
-#include <game/client/components/fluffytw/aimbot/aimbot.h>
-#include <game/client/components/fluffytw/f_visuals.h>
-
 #include "base/logger.h"
 
-class FHelper
+#include "game/client/components/shikon/aimbot/aimbot.h"
+#include "game/client/components/shikon/bots.h"
+#include "game/client/components/shikon/visuals.h"
+
+#include <memory>
+
+class CSHHelper
 {
 protected:
 	[[nodiscard]] CGameClient*	  GameClient()	  const { return m_pClient; }
@@ -24,34 +24,34 @@ protected:
 	[[nodiscard]] IServerBrowser* ServerBrowser() const { return m_pClient->ServerBrowser(); }
 
 public:
-	FHelper(CGameClient *client) noexcept;
+	CSHHelper(CGameClient *Client) noexcept;
 
 	// Main pointer(needs to be raw)
 	CGameClient* m_pClient = nullptr;
 
 	// Pointers
-	std::unique_ptr<FBots>    m_pBots;
-	std::unique_ptr<FAimbot>  m_pAimbot;
-	std::unique_ptr<FVisuals> m_pVisuals;
+	std::unique_ptr<CSHBots>    m_pBots;
+	std::unique_ptr<CSHAimbot>  m_pAimbot;
+	std::unique_ptr<CSHVisuals> m_pVisuals;
 
 	void TickPredict(CNetObj_Character *pCharacter, int t, vec2 *m_pPosArray);
 	int GetCustomTile(float x, float y) const;
 
 	bool IsLocalActive();
-	bool IsValidId(int id);
-	bool IsGrounded(int id, vec2 pos = vec2(0, 0));
+	bool IsValidId(int Id);
+	bool IsGrounded(int Id, vec2 Pos = vec2(0, 0));
 
 	// Example usage fHelper->dbg_msg("bot", "bot: hook = %d", Controls()->m_aInputData[LOCAL].m_Hook)
 	// prints to the chat as echo for some simple debug messages or information
-	void dbg_msg(const char *sys, const char *fmt, ...)
+	void dbg_msg(const char *Sys, const char *Fmt, ...)
 	{
-		va_list args;
-		va_start(args, fmt);
+		va_list Args;
+		va_start(Args, Fmt);
 		CLogMessage Msg;
 		Msg.m_Level = LEVEL_INFO;
 		str_timestamp_format(Msg.m_aTimestamp, sizeof(Msg.m_aTimestamp), FORMAT_SPACE);
 		Msg.m_TimestampLength = str_length(Msg.m_aTimestamp);
-		str_copy(Msg.m_aSystem, sys);
+		str_copy(Msg.m_aSystem, Sys);
 		Msg.m_SystemLength = str_length(Msg.m_aSystem);
 
 		// TODO: Add level?
@@ -60,10 +60,10 @@ public:
 
 		char *pMessage = Msg.m_aLine + Msg.m_LineMessageOffset;
 		int MessageSize = sizeof(Msg.m_aLine) - Msg.m_LineMessageOffset;
-		str_format_v(pMessage, MessageSize, fmt, args);
+		str_format_v(pMessage, MessageSize, Fmt, Args);
 		m_pClient->Echo(pMessage);
-		va_end(args);
+		va_end(Args);
 	}
 };
 
-extern std::unique_ptr<FHelper> fHelper;
+extern std::unique_ptr<CSHHelper> shHelper;

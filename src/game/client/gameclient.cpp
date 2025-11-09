@@ -97,9 +97,9 @@
 #endif
 
 // shikon
-#include "components/fluffytw/f_helper.h"
+#include "components/shikon/helper.h"
 #include <memory.h>
-std::unique_ptr<FHelper> fHelper;
+std::unique_ptr<CSHHelper> shHelper;
 
 using namespace std::chrono_literals;
 
@@ -431,7 +431,7 @@ void CGameClient::OnConsoleInit()
 	m_pMap = CreateMap();
 
 	// shikon
-	fHelper = std::make_unique<FHelper>(this);
+	shHelper = std::make_unique<CSHHelper>(this);
 
 	// make a list of all the systems, make sure to add them in the correct render order
 	m_vpAll.insert(m_vpAll.end(), {&m_Skins,

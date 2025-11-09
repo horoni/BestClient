@@ -1,13 +1,13 @@
 #pragma once
 
+#include "game/client/components/shikon/component.h"
 #include <game/client/gameclient.h>
-#include "game/client/components/fluffytw/f_component.h"
 
-class FVisuals : public FComponent
+class CSHVisuals : public CSHComponent
 {
 public:
-	FVisuals(CGameClient *pClient) :
-		FComponent(pClient){}
+	CSHVisuals(CGameClient *pClient) :
+		CSHComponent(pClient){}
 
 	void Run(int ClientID, float Angle, vec2 Position);
 
