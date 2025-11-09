@@ -911,7 +911,7 @@ private:
 	// found in menus_settings.cpp
 	void RenderSettingsDDNet(CUIRect MainView);
 	void RenderSettingsAppearance(CUIRect MainView);
-  void RenderSettingsShikon(CUIRect MainView);
+	void RenderSettingsShikon(CUIRect MainView);
 
 	// found in menus_bestclient.cpp
 	struct SPopupVoiceModerationContext
