@@ -19,6 +19,7 @@ public:
 		CSHComponent(pClient) {}
 
 	void Aimbot();
+	bool AutoLaser();
 
 	// Gets
 	void GetClosestHitpoint(EWeapon Weapon);

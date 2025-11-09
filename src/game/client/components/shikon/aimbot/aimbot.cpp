@@ -17,9 +17,8 @@ void CSHAimbot::Aimbot()
 
 	if (g_Config.m_ShAimLaserAuto && Weapon == EWeapon::Laser)
 	{
-		GetClosestHitpoint(EWeapon::Laser);
-		Aim(NormalizeAim(m_TargetPos));
-		Controls()->m_aInputData[LOCAL].m_Fire = 1;
+		if (AutoLaser())
+			return;
 	}
 
 	if(Controls()->m_aInputData[LOCAL].m_Hook == 1 && g_Config.m_ShAimHook)
@@ -55,6 +54,16 @@ void CSHAimbot::Aimbot()
 	}
 	else
 		m_CanAim = true;
+}
+
+bool CSHAimbot::AutoLaser()
+{
+	GetClosestHitpoint(EWeapon::Laser);
+	if (!m_TargetVisible)
+		return false;
+	Aim(NormalizeAim(m_TargetPos));
+	Controls()->m_aInputData[LOCAL].m_Fire = 1;
+	return true;
 }
 
 void CSHAimbot::GetClosestHitpoint(EWeapon Weapon)
