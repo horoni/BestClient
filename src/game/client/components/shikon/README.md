@@ -6,10 +6,13 @@ Hack based on [fluffytw](https://github.com/krxclient/fluffytw) hacking library
 ### Features
  - [x] Laser Aimbot
  - [x] AutoLaser (When enemy arrive to the screen he immediately will be shooted)
+ - [ ] Auto hit through wall with hammer
+ - [ ] Head balancer
  - [ ] Auto Unfreeze
- - [ ] Avoid Freeze
+ - [ ] Avoid Freeze (Legit mode: You cant walk or hook (if it on top, so you can fall) to freeze. Aggressive: you CANT FALL TO FREEZE at all, hooks everywhere and controls left-right to prevent fall to freeze)
  - [ ] Implement grenade prediction
  - [ ] Auto Switch to Laser if `AutoLaser` enabled
+ - [ ] Coordinates aligner (Walk to center of tile)
 
 ### Refactor
  - [ ] Maybe there is a better way to detect shotgun mode?
