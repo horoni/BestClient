@@ -106,7 +106,7 @@ void CSHAimbot::GetClosestHitpoint(EWeapon Weapon)
 			break;
 	}
 
-	if(!shHelper->IsValidId(m_TargetId))
+	if(!shHelper->IsValidId(m_TargetId) || !m_pClient->m_Snap.m_pLocalCharacter)
 	{
 		if (g_Config.m_ShDbg)
 			shHelper->dbg_msg("bot", "bot: InvalidClosestID");
@@ -119,8 +119,12 @@ void CSHAimbot::GetClosestHitpoint(EWeapon Weapon)
 
 	if (g_Config.m_ShDbg)
 		shHelper->dbg_msg("bot", "bot: ValidClosestID");
-	m_MyPos = m_pClient->m_PredictedChar.m_Pos;
-	m_MyVel = m_pClient->m_PredictedChar.m_Vel;
+
+	m_MyPos = vec2(m_pClient->m_Snap.m_pLocalCharacter->m_X,
+		m_pClient->m_Snap.m_pLocalCharacter->m_Y);
+	m_MyVel = vec2(m_pClient->m_Snap.m_pLocalCharacter->m_VelX,
+		m_pClient->m_Snap.m_pLocalCharacter->m_VelY);
+
 	m_TargetPos = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Pos;
 	m_TargetVel = m_pClient->m_aClients[m_TargetId].m_Predicted.m_Vel;
 	m_TargetPos = EdgeScan(Weapon);
@@ -298,9 +302,10 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 			DoBreak = true;
 		}
 
-		// TODO(horoni): Can it be used with any weapon?
 		int TeleNr = 0;
-		const int Hit = Collision()->IntersectLineTeleHook(OldPos, NewPos, &FinishPos, nullptr, &TeleNr);
+		const int Hit = Weapon == EWeapon::Hook ?
+			Collision()->IntersectLineTeleHook(OldPos, NewPos, &FinishPos, nullptr, &TeleNr)
+			: Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &FinishPos, nullptr, &TeleNr);
 
 		if(IntersectCharacter(OldPos, TargetPos, FinishPos))
 			return true;

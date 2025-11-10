@@ -22,9 +22,7 @@ Hack based on [fluffytw](https://github.com/krxclient/fluffytw) hacking library
  - [ ] Maybe there is a better way to detect shotgun mode?
 
 ### Fixes
- - [ ] `HitScanWeapon()`: `IntersectLineTeleHook()` can it be used with any weapon?
  - [ ] Use Local Tuning instead Global
  - [ ] Fix weapon reach constants (Hammer!)
  - [ ] Fix ESP Draw FOV
- - [ ] Fix AutoLaser shoots earlier than enemy can be shooted (it shoots to wall instead enemy)
 
