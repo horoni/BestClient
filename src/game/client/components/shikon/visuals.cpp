@@ -70,6 +70,8 @@ void CSHVisuals::DrawPredict()
 	static std::array<vec2, 32> s_aPos;
 	const int Ticks = g_Config.m_ShEspPredictTicks;
 	CNetObj_Character *pLocalCharacter = const_cast<CNetObj_Character *>(m_pClient->m_Snap.m_pLocalCharacter);
+	if (!pLocalCharacter)
+		return;
 
 	shHelper->TickPredict(pLocalCharacter, Ticks, s_aPos.data());
 
