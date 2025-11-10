@@ -1,12 +1,15 @@
 #include "game/client/components/shikon/aimbot/aimbot.h"
 #include "game/client/components/shikon/helper.h"
 #include "game/client/components/shikon/visuals.h"
+#include <array>
 
 void CSHVisuals::Run(int ClientID, float Angle, vec2 Position)
 {
 	if(!g_Config.m_ShEsp)
 		return;
 	Graphics()->TextureClear();
+	if(g_Config.m_ShEspPredict)
+		DrawPredict();
 	DrawFov();
 }
 
@@ -59,6 +62,23 @@ void CSHVisuals::DrawFovLine(float Offset, ColorRGBA Color)
 	Collision()->IntersectLineTeleHook(InitPos, FinishPos, &FinishPos, nullptr, &TeleNr);
 
 	DrawLine(InitPos, FinishPos, Color);
+}
+
+void CSHVisuals::DrawPredict()
+{
+	// TODO(horoni): Make dots red if it go through freeze
+	static std::array<vec2, 32> s_aPos;
+	const int Ticks = g_Config.m_ShEspPredictTicks;
+	CNetObj_Character *pLocalCharacter = const_cast<CNetObj_Character *>(m_pClient->m_Snap.m_pLocalCharacter);
+
+	shHelper->TickPredict(pLocalCharacter, Ticks, s_aPos.data());
+
+	for (int i = 0; i < Ticks; i++)
+	{
+		if (g_Config.m_ShEspPredictEven && i % 2 == 1)
+			continue;
+		DrawCircle(s_aPos[i], 4, ColorRGBA(1, 255, 1, 0.8));
+	}
 }
 
 void CSHVisuals::DrawLine(vec2 Pos1, vec2 Pos2, ColorRGBA Color)

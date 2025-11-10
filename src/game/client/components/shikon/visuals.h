@@ -21,4 +21,6 @@ private:
 	void DrawFov();
 	void DrawFovF(int Fov, ColorHSLA Color);
 	void DrawFovLine(float Offset, ColorRGBA Color);
+
+	void DrawPredict();
 };

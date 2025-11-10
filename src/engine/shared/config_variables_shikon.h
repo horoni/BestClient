@@ -16,6 +16,9 @@ MACRO_CONFIG_INT(ShEspHookFov, sh_esp_hook_fov, 0, 0, 1, CFGFLAG_CLIENT | CFGFLA
 MACRO_CONFIG_INT(ShEspWeaponFov, sh_esp_weapon_fov, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Draw Weapon FOV")
 MACRO_CONFIG_COL(ShEspHookFovCol, sh_esp_hook_fov_col, 4294901760, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Hook FOV Color")
 MACRO_CONFIG_COL(ShEspWeaponFovCol, sh_esp_weapon_fov_col, 4294901760, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Weapon FOV Color")
+MACRO_CONFIG_INT(ShEspPredict, sh_esp_predict, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show prediction");
+MACRO_CONFIG_INT(ShEspPredictEven, sh_esp_predict_even, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show prediction even ticks");
+MACRO_CONFIG_INT(ShEspPredictTicks, sh_esp_predict_ticks, 16, 1, 32, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Prediction ticks");
 
 // <><><> AimBot <><><><><>
 MACRO_CONFIG_INT(ShAim, sh_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Aimbot enable")
