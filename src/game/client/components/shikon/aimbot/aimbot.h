@@ -25,6 +25,8 @@ public:
 	void GetClosestHitpoint(EWeapon Weapon);
 	int GetClosestId(int Fov = 360, float Range = 395.f);
 	[[nodiscard]] float GetPing() const;
+	float GetWeaponReach(EWeapon Weapon);
+	float GetWeaponSpeed(EWeapon Weapon);
 
 	// Helpers
 	bool PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel);

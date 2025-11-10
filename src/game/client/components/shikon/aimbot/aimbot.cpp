@@ -200,30 +200,7 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 	const vec2 Delta = TargetPos - MyPos;
 	const vec2 DeltaVel = TargetVel - MyVel;
 
-	float WSpeed;
-	switch(Weapon) {
-		case EWeapon::Hook:
-			WSpeed = Tuning()->m_HookFireSpeed;
-			break;
-		case EWeapon::Hammer:
-			WSpeed = INSTANT_SPEED;
-			break;
-		case EWeapon::Gun:
-			WSpeed = Tuning()->m_GunSpeed;
-			break;
-		case EWeapon::Shotgun:
-			// TODO(horoni): Maybe there is a better way to detect shotgun mode? 
-			if (m_pClient->m_GameWorld.m_WorldConfig.m_IsDDRace)
-				WSpeed = INSTANT_SPEED;
-			else WSpeed = Tuning()->m_ShotgunSpeed;
-			break;
-		case EWeapon::Grenade:
-			return false;
-			break;
-		case EWeapon::Laser:
-			WSpeed = INSTANT_SPEED;
-			break;
-	}
+	float WSpeed = GetWeaponSpeed(Weapon);
 
 	const float WeaponSpeed = length(TargetVel) + WSpeed;
 	const float a = dot(DeltaVel, DeltaVel) - powf(WeaponSpeed, 2);
@@ -246,42 +223,8 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 
 bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir)
 {
-	float WSpeed;
-	float WReach;
-
-	switch(Weapon) {
-		case EWeapon::Hook:
-			WSpeed = Tuning()->m_HookFireSpeed;
-			WReach = Tuning()->m_HookLength;
-			break;
-		case EWeapon::Hammer:
-			// FIX: Hammer reach
-			WSpeed = INSTANT_SPEED;
-			WReach = 20.f; // I dont know how much really
-		case EWeapon::Gun:
-			// FIX: Gun reach
-			WSpeed = Tuning()->m_GunSpeed;
-			WReach = 800.f;
-			break;
-		case EWeapon::Shotgun:
-			// TODO(horoni): Maybe there is a better way to detect shotgun mode? 
-			if (m_pClient->m_GameWorld.m_WorldConfig.m_IsDDRace) {
-				WSpeed = INSTANT_SPEED;
-				WReach = Tuning()->m_LaserReach;
-			} else {
-				// FIX?: Reach distance
-				WSpeed = Tuning()->m_ShotgunSpeed;
-				WReach = 400.f;
-			}
-			break;
-		case EWeapon::Grenade:
-			return false;
-			break;
-		case EWeapon::Laser:
-			WSpeed = INSTANT_SPEED;
-			WReach = Tuning()->m_LaserReach;
-			break;
-	}
+	float WSpeed = GetWeaponSpeed(Weapon);
+	float WReach = GetWeaponReach(Weapon);
 
 	vec2 ExDirection = normalize(ScanDir);
 	vec2 FinishPos = InitPos + ExDirection * (WReach - PHYS_SIZE * 1.5f);
@@ -385,4 +328,30 @@ bool CSHAimbot::InFov(float Fov, vec2 Dir)
 	if(DifferenceAngle > Fov)
 		return false;
 	return true;
+}
+
+float CSHAimbot::GetWeaponReach(EWeapon Weapon)
+{
+	switch (Weapon) {
+		case EWeapon::Hook: return Tuning()->m_HookLength;
+		case EWeapon::Hammer: return 20.f; // FIX: I dont know how much really
+		case EWeapon::Gun: return 800.f;
+		// TODO(horoni): Maybe there is a better way to detect shotgun mode?
+		case EWeapon::Shotgun: return m_pClient->m_GameWorld.m_WorldConfig.m_IsDDRace ? Tuning()->m_LaserReach : 400.f;
+		case EWeapon::Grenade: return 0.f;
+		case EWeapon::Laser: return Tuning()->m_LaserReach;
+	}
+}
+
+float CSHAimbot::GetWeaponSpeed(EWeapon Weapon)
+{
+	switch (Weapon) {
+		case EWeapon::Hook: return Tuning()->m_HookFireSpeed;
+		case EWeapon::Hammer: return INSTANT_SPEED;
+		case EWeapon::Gun: return Tuning()->m_GunSpeed;
+		// TODO(horoni): Maybe there is a better way to detect shotgun mode?
+		case EWeapon::Shotgun: return m_pClient->m_GameWorld.m_WorldConfig.m_IsDDRace ? INSTANT_SPEED : Tuning()->m_ShotgunSpeed;
+		case EWeapon::Grenade: return 0.f;
+		case EWeapon::Laser: return INSTANT_SPEED;
+	}
 }
