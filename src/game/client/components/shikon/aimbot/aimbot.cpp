@@ -58,11 +58,24 @@ void CSHAimbot::Aimbot()
 
 bool CSHAimbot::AutoLaser()
 {
+	static bool s_Fired = false;
+
+	if (s_Fired)
+	{
+		Controls()->m_aLastData[LOCAL].m_Fire = 0;
+		Controls()->m_aInputData[LOCAL].m_Fire = 0;
+		s_Fired = false;
+		return false;
+	}
+
 	GetClosestHitpoint(EWeapon::Laser);
 	if (!m_TargetVisible)
 		return false;
+
 	Aim(NormalizeAim(m_TargetPos));
 	Controls()->m_aInputData[LOCAL].m_Fire = 1;
+	s_Fired = true;
+
 	return true;
 }
 
