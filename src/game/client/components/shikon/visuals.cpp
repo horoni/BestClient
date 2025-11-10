@@ -41,9 +41,10 @@ void CSHVisuals::DrawFov()
 	}
 }
 
-void CSHVisuals::DrawFovF(int Fov, ColorRGBA Color) {
-	DrawFovLine(Fov * 0.01f, Color);
-	DrawFovLine(Fov * -0.01f, Color);
+void CSHVisuals::DrawFovF(int Fov, ColorHSLA Color) {
+	ColorRGBA Col = color_cast<ColorRGBA>(Color);
+	DrawFovLine(Fov * 0.01f, Col);
+	DrawFovLine(Fov * -0.01f, Col);
 }
 
 void CSHVisuals::DrawFovLine(float Offset, ColorRGBA Color)

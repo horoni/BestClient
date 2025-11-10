@@ -19,6 +19,6 @@ public:
 private:
 	// Aimbot Fov
 	void DrawFov();
-	void DrawFovF(int Fov, ColorRGBA Color);
+	void DrawFovF(int Fov, ColorHSLA Color);
 	void DrawFovLine(float Offset, ColorRGBA Color);
 };

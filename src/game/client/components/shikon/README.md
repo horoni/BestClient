@@ -22,5 +22,5 @@ Hack based on [fluffytw](https://github.com/krxclient/fluffytw) hacking library
  - [ ] `HitScanWeapon()`: `IntersectLineTeleHook()` can it be used with any weapon?
  - [ ] Use Local Tuning instead Global
  - [ ] Fix weapon reach constants (Hammer!)
- - [ ] Fix ESP Draw FOV and Colors
+ - [ ] Fix ESP Draw FOV
 
