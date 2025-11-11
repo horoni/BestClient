@@ -1,13 +1,13 @@
 #include "game/client/components/shikon/aimbot/aimbot.h"
 #include "game/client/components/shikon/helper.h"
 #include "game/client/components/shikon/visuals.h"
+#include "game/client/prediction/entities/character.h"
 #include <array>
 
 void CSHVisuals::Run(int ClientID, float Angle, vec2 Position)
 {
 	if(!g_Config.m_ShEsp)
 		return;
-	Graphics()->TextureClear();
 	if(g_Config.m_ShEspPredict)
 		DrawPredict();
 	DrawFov();
@@ -64,30 +64,42 @@ void CSHVisuals::DrawFovLines(int Fov, ColorHSLA Color) {
 
 void CSHVisuals::DrawPredict()
 {
-	// TODO(horoni): Make dots red if it go through freeze
-	static std::array<vec2, 32> s_aPos;
-	const int Ticks = g_Config.m_ShEspPredictTicks;
-	CNetObj_Character *pLocalCharacter = const_cast<CNetObj_Character *>(m_pClient->m_Snap.m_pLocalCharacter);
-	if (!pLocalCharacter)
-		return;
+	// TODO(horoni): Optimize
+	CGameWorld TmpWorld;
+	TmpWorld.CopyWorld(&m_pClient->m_PredictedWorld);
 
-	shHelper->TickPredict(pLocalCharacter, Ticks, s_aPos.data());
-
-	for (int i = 0; i < Ticks; i++)
+	Graphics()->TextureClear();
+	Graphics()->QuadsBegin();
+	for (int i = 0; i < g_Config.m_ShEspPredictTicks; i++)
 	{
+		TmpWorld.Tick();
 		if (g_Config.m_ShEspPredictEven && i % 2 == 1)
 			continue;
-		DrawCircle(s_aPos[i], 4, ColorRGBA(1, 255, 1, 0.8));
+
+		CCharacter *LocalChar = TmpWorld.GetCharacterById(m_pClient->m_Snap.m_LocalClientId);
+		if (!LocalChar)
+			break;
+
+		vec2 Pos = LocalChar->m_Pos;
+		ColorRGBA Col = LocalChar->m_FreezeTime > 0 ? ColorRGBA(0xFF0000) : ColorRGBA(0x1FFF01);
+		Col.a = 0.6f;
+
+		Graphics()->SetColor(Col);
+		Graphics()->DrawCircle(Pos.x, Pos.y, 4, 16);
 	}
+	Graphics()->QuadsEnd();
+	Graphics()->SetColor(1.f, 1.f, 1.f, 1.f);
 }
 
 void CSHVisuals::DrawLine(vec2 Pos1, vec2 Pos2, ColorRGBA Color)
 {
+	Graphics()->TextureClear();
 	Graphics()->LinesBegin();
 	const IGraphics::CLineItem LineItem(Pos1.x, Pos1.y, Pos2.x, Pos2.y);
 	Graphics()->SetColor(Color);
 	Graphics()->LinesDraw(&LineItem, 1);
 	Graphics()->LinesEnd();
+	Graphics()->SetColor(1.f, 1.f, 1.f, 1.f);
 }
 
 void CSHVisuals::DrawCircle(vec2 Pos, float Size, ColorRGBA Color)

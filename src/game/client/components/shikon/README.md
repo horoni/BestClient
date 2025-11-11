@@ -16,7 +16,7 @@ Hack based on [fluffytw](https://github.com/krxclient/fluffytw) hacking library
  - [ ] Coordinates aligner (Walk to center of tile)
 
 ### Improvements
- - [ ] ESP(Predict): Draw green and red dots like KRX
+ - [ ] ESP(`DrawPredict()`): Optimize (dont copy world every frame?)
 
 ### Refactor
  - [ ] Maybe there is a better way to detect shotgun mode?
