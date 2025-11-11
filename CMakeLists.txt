@@ -2780,6 +2780,7 @@ if(CLIENT)
     components/shikon/bots.cpp
     components/shikon/bots.h
     components/shikon/component.h
+    components/shikon/defs.h
     components/shikon/helper.cpp
     components/shikon/helper.h
     components/shikon/visuals.cpp

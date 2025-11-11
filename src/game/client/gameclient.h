@@ -66,6 +66,10 @@
 #include "components/spectator.h"
 #include "components/statboard.h"
 #include "components/bestclient/clientindicator/client_indicator.h"
+#include "components/shikon/aimbot/aimbot.h"
+#include "components/shikon/bots.h"
+#include "components/shikon/helper.h"
+#include "components/shikon/visuals.h"
 #include "components/tclient/bg_draw.h"
 #include "components/tclient/bindchat.h"
 #include "components/tclient/bindwheel.h"
@@ -230,6 +234,12 @@ public:
 	CTooltips m_Tooltips;
 
 	CLocalServer m_LocalServer;
+
+	// Shikon Components
+	CSHVisuals m_Visuals;
+	CSHAimbot m_Aimbot;
+	CSHHelper m_Helper;
+	CSHBots m_Bots;
 
 	// TClient Components
 	CSkinProfiles m_SkinProfiles;

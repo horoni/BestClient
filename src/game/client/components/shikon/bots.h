@@ -1,12 +1,11 @@
 #pragma once
 
-#include "game/client/components/shikon/component.h"
-#include <game/client/gameclient.h>
+#include <game/client/component.h>
 
-class CSHBots : public CSHComponent
+class CSHBots : public CComponent
 {
 public:
-	CSHBots(CGameClient *pClient) :
-		CSHComponent(pClient){}
+	int Sizeof() const override { return sizeof(*this); }
+
 	void Run();
 };

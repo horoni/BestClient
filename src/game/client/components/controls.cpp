@@ -323,7 +323,7 @@ int CControls::SnapInput(int *pData)
 		m_aInputData[g_Config.m_ClDummy].m_Direction = ResolveMovementDirection(g_Config.m_ClDummy, LeftPressed, RightPressed, /*UpdateState=*/true);
 
 		// shikon
-		shHelper->m_pBots->Run();
+		GameClient()->m_Bots.Run();
 
 		// dummy copy moves
 		if(g_Config.m_ClDummyCopyMoves)

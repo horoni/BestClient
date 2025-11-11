@@ -1,13 +1,12 @@
 #pragma once
 
-#include "game/client/components/shikon/component.h"
-#include <game/client/gameclient.h>
+#include <base/color.h>
+#include <game/client/component.h>
 
-class CSHVisuals : public CSHComponent
+class CSHVisuals : public CComponent
 {
 public:
-	CSHVisuals(CGameClient *pClient) :
-		CSHComponent(pClient){}
+	int Sizeof() const override { return sizeof(*this); }
 
 	void Run(int ClientID, float Angle, vec2 Position);
 

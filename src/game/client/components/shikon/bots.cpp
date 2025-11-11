@@ -1,7 +1,7 @@
 #include "game/client/components/shikon/bots.h"
-#include "game/client/components/shikon/helper.h"
+#include <game/client/gameclient.h>
 
 void CSHBots::Run()
 {
-	shHelper->m_pAimbot->Aimbot();
+	GameClient()->m_Aimbot.Aimbot();
 }

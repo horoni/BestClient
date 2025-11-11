@@ -85,7 +85,6 @@
 #include <cmath>
 #include <limits>
 
-
 #if defined(CONF_FAMILY_WINDOWS)
 // clang-format off
 #include <windows.h>
@@ -95,11 +94,6 @@
 #undef ERROR
 #endif
 #endif
-
-// shikon
-#include "components/shikon/helper.h"
-#include <memory.h>
-std::unique_ptr<CSHHelper> shHelper;
 
 using namespace std::chrono_literals;
 
@@ -430,9 +424,6 @@ void CGameClient::OnConsoleInit()
 	m_pHttp = Kernel()->RequestInterface<IHttp>();
 	m_pMap = CreateMap();
 
-	// shikon
-	shHelper = std::make_unique<CSHHelper>(this);
-
 	// make a list of all the systems, make sure to add them in the correct render order
 	m_vpAll.insert(m_vpAll.end(), {&m_Skins,
 					      &m_Skins7,
@@ -488,6 +479,10 @@ void CGameClient::OnConsoleInit()
 					      &m_Mod, // TClient
 					      &m_CustomCommunities, // TClient
 					      &m_MusicPlayer, // BestClient
+					      &m_Visuals, // Shikon
+					      &m_Aimbot, // Shikon
+					      &m_Helper, // Shikon
+					      &m_Bots, // Shikon
 					      &m_Hud,
 					      &m_Spectator,
 					      &m_Emoticon,

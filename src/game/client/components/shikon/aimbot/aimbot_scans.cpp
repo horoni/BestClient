@@ -1,5 +1,9 @@
 #include "game/client/components/shikon/aimbot/aimbot.h"
-#include "game/client/components/shikon/helper.h"
+#include "game/client/components/shikon/defs.h"
+#include "game/client/prediction/gameworld.h"
+#include <engine/shared/config.h>
+
+#define MAX_HITPOINTS 32
 
 vec2 CSHAimbot::EdgeScan(EWeapon Weapon)
 {

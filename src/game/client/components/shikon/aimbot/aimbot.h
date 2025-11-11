@@ -1,7 +1,6 @@
 #pragma once
 
-#include "game/client/components/shikon/component.h"
-#include <game/client/gameclient.h>
+#include <game/client/component.h>
 
 enum class EWeapon {
 	Hammer = 0,
@@ -12,11 +11,10 @@ enum class EWeapon {
 	Hook = 5,
 };
 
-class CSHAimbot : public CSHComponent
+class CSHAimbot : public CComponent
 {
 public:
-	CSHAimbot(CGameClient *pClient) :
-		CSHComponent(pClient) {}
+	int Sizeof() const override { return sizeof(*this); }
 
 	void Aimbot();
 	bool AutoLaser();
