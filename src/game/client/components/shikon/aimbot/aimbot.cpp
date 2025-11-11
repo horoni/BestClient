@@ -165,7 +165,7 @@ int CSHAimbot::GetClosestId(int Fov, float Range)
 		// FNG: Skip if Tee is frozen and current weapon is Laser
 		if((m_pClient->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng)
 				&& m_pClient->m_Snap.m_pLocalCharacter->m_Weapon == (int)EWeapon::Laser
-				&& m_pClient->m_aClients[i].m_LiveFrozen)
+				&& (m_pClient->m_aClients[i].m_Predicted.m_FreezeEnd > 0 || m_pClient->m_aClients[i].m_Predicted.m_IsInFreeze))
 				continue;
 
 		if(ClosestID != -1 && GameWorld()->m_GameTick % 150 != 0)
