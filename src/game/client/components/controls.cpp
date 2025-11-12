@@ -18,9 +18,6 @@
 #include <game/client/gameclient.h>
 #include <game/collision.h>
 
-//shikon
-#include "shikon/helper.h"
-
 CControls::CControls()
 {
 	mem_zero(&m_aLastData, sizeof(m_aLastData));

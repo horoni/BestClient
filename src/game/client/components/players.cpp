@@ -31,9 +31,6 @@
 #include <game/client/components/tclient/rainbow.h>
 #include <game/client/prediction/entities/character.h>
 
-// shikon
-#include "shikon/helper.h"
-
 static float CalculateHandAngle(vec2 Dir, float AngleOffset)
 {
 	const float Angle = angle(Dir);
