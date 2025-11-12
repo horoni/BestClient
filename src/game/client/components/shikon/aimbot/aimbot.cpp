@@ -335,11 +335,11 @@ float CSHAimbot::GetWeaponReach(EWeapon Weapon)
 {
 	switch (Weapon) {
 		case EWeapon::Hook: return GameClient()->GetTuning(0)->m_HookLength;
-		case EWeapon::Hammer: return 20.f; // FIX: I dont know how much really
-		case EWeapon::Gun: return 800.f;
+		case EWeapon::Hammer: return 63.f;
+		case EWeapon::Gun: return GameClient()->GetTuning(0)->m_GunSpeed * GameClient()->GetTuning(0)->m_GunLifetime;
 		// TODO(horoni): Maybe there is a better way to detect shotgun mode?
 		case EWeapon::Shotgun: return GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace ? GameClient()->GetTuning(0)->m_LaserReach : 400.f;
-		case EWeapon::Grenade: return 0.f;
+		case EWeapon::Grenade: return GameClient()->GetTuning(0)->m_GrenadeSpeed * GameClient()->GetTuning(0)->m_GrenadeLifetime;
 		case EWeapon::Laser: return GameClient()->GetTuning(0)->m_LaserReach;
 	}
 }
@@ -352,7 +352,7 @@ float CSHAimbot::GetWeaponSpeed(EWeapon Weapon)
 		case EWeapon::Gun: return GameClient()->GetTuning(0)->m_GunSpeed;
 		// TODO(horoni): Maybe there is a better way to detect shotgun mode?
 		case EWeapon::Shotgun: return GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace ? INSTANT_SPEED : GameClient()->GetTuning(0)->m_ShotgunSpeed;
-		case EWeapon::Grenade: return 0.f;
+		case EWeapon::Grenade: return GameClient()->GetTuning(0)->m_GrenadeSpeed;
 		case EWeapon::Laser: return INSTANT_SPEED;
 	}
 }
