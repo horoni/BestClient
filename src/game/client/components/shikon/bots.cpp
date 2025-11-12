@@ -4,4 +4,5 @@
 void CSHBots::Run()
 {
 	GameClient()->m_Aimbot.Aimbot();
+	GameClient()->m_BalanceBot.Balance();
 }

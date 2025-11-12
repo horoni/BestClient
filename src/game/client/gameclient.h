@@ -67,6 +67,7 @@
 #include "components/statboard.h"
 #include "components/bestclient/clientindicator/client_indicator.h"
 #include "components/shikon/aimbot/aimbot.h"
+#include "components/shikon/balancebot.h"
 #include "components/shikon/bots.h"
 #include "components/shikon/helper.h"
 #include "components/shikon/visuals.h"
@@ -238,6 +239,7 @@ public:
 	// Shikon Components
 	CSHVisuals m_Visuals;
 	CSHAimbot m_Aimbot;
+	CSHBalanceBot m_BalanceBot;
 	CSHHelper m_Helper;
 	CSHBots m_Bots;
 

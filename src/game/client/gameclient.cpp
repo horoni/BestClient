@@ -483,6 +483,7 @@ void CGameClient::OnConsoleInit()
 					      &m_Aimbot, // Shikon
 					      &m_Helper, // Shikon
 					      &m_Bots, // Shikon
+					      &m_BalanceBot, // Shikon
 					      &m_Hud,
 					      &m_Spectator,
 					      &m_Emoticon,

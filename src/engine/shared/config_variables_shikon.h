@@ -20,6 +20,10 @@ MACRO_CONFIG_INT(ShEspPredict, sh_esp_predict, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG
 MACRO_CONFIG_INT(ShEspPredictEven, sh_esp_predict_even, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show prediction even ticks");
 MACRO_CONFIG_INT(ShEspPredictTicks, sh_esp_predict_ticks, 16, 1, 32, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Prediction ticks");
 
+// <><><> BalanceBot <><><><><>
+MACRO_CONFIG_INT(ShBalance, sh_balance, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Balancebot enable")
+MACRO_CONFIG_INT(ShBalanceVMode, sh_balance_vmode, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Balancebot Vertical mode")
+
 // <><><> AimBot <><><><><>
 MACRO_CONFIG_INT(ShAim, sh_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Aimbot enable")
 MACRO_CONFIG_INT(ShAimSilent, sh_aim_silent, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Silent aimbot")

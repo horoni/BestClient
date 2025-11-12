@@ -3319,6 +3319,16 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	Ui()->DoLabel(&Label, "Other", HeadlineFontSize, TEXTALIGN_ML);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
+  DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShBalance, ("BalanceBot"), &g_Config.m_ShBalance, &Column, LineSize);
+
+	const char *apBalanceVMode[] = {"Below", "Above", "Both"};
+	static CUi::SDropDownState s_BalanceVModeDropDownState;
+	static CScrollRegion s_BalanceVModeDropDownScrollRegion;
+	s_BalanceVModeDropDownState.m_SelectionPopupContext.m_pScrollRegion = &s_BalanceVModeDropDownScrollRegion;
+	CUIRect BalanceVModeDropDownRect;
+	Column.HSplitTop(LineSize, &BalanceVModeDropDownRect, &Column);
+	g_Config.m_ShBalanceVMode = Ui()->DoDropDown(&BalanceVModeDropDownRect, g_Config.m_ShBalanceVMode, apBalanceVMode, std::size(apBalanceVMode), s_BalanceVModeDropDownState);
+
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShDbg, ("Debug"), &g_Config.m_ShDbg, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEsp, ("ESP"), &g_Config.m_ShEsp, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspHookFov, ("Draw Hook FOV"), &g_Config.m_ShEspHookFov, &Column, LineSize);

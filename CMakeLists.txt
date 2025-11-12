@@ -2777,6 +2777,8 @@ if(CLIENT)
     components/shikon/aimbot/aimbot.cpp
     components/shikon/aimbot/aimbot.h
     components/shikon/aimbot/aimbot_scans.cpp
+    components/shikon/balancebot.cpp
+    components/shikon/balancebot.h
     components/shikon/bots.cpp
     components/shikon/bots.h
     components/shikon/component.h
