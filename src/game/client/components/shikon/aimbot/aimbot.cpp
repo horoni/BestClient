@@ -69,6 +69,9 @@ bool CSHAimbot::AutoLaser()
 		return false;
 	}
 
+	if (GameClient()->m_GameWorld.GetCharacterById(LOCAL_ID)->GetReloadTimer() > 0)
+		return false;
+
 	GetClosestHitpoint(EWeapon::Laser);
 	if (!m_TargetVisible)
 		return false;

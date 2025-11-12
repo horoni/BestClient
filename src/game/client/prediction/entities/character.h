@@ -137,6 +137,9 @@ public:
 	int m_FreezeAccumulation;
 	int m_AliveAccumulation;
 
+	// shikon
+	int GetReloadTimer() const { return m_ReloadTimer; }
+
 	// TClient
 	CNetObj_PlayerInput *LatestInput() { return &m_LatestInput; }
 
