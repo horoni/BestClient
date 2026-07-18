@@ -92,22 +92,24 @@ bool CSHAimbot::AutoLaser()
 std::optional<CSHAimbot::CAimTargetInfo>
 CSHAimbot::GetClosestTarget(EWeapon Weapon)
 {
+	const int LocalId = GetLocalId(GameClient());
 	int TargetId = -1;
+	float WReach = GetWeaponReach(Weapon) + 15.f;
 
 	switch(Weapon) {
 		case EWeapon::Hook:
-			TargetId = GetClosestId(g_Config.m_ShAimHookFov);
+			TargetId = GetClosestId(g_Config.m_ShAimHookFov, WReach);
 			break;
 		case EWeapon::Hammer:
-			TargetId = GetClosestId(g_Config.m_ShAimHammerFov, 21.f);
+			TargetId = GetClosestId(g_Config.m_ShAimHammerFov, WReach);
 			break;
 		case EWeapon::Gun:
-			TargetId = GetClosestId(g_Config.m_ShAimGunFov, 815.f);
+			TargetId = GetClosestId(g_Config.m_ShAimGunFov, WReach);
 			break;
 		case EWeapon::Shotgun:
 			if (GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace)
-				TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, GameClient()->GetTuning(0)->m_LaserReach + 15.f);
-			else TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, 415.f);
+				TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, GetWeaponReach(EWeapon::Laser) + 15.f);
+			else TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, WReach);
 			break;
 		case EWeapon::Grenade:
 			// TODO(horoni): Implement grenade prediction
@@ -115,7 +117,7 @@ CSHAimbot::GetClosestTarget(EWeapon Weapon)
 			break;
 		case EWeapon::Laser:
 			// Range is shorter than 815 but we predicting
-			TargetId = GetClosestId(g_Config.m_ShAimLaserFov, GameClient()->GetTuning(0)->m_LaserReach + 15.f);
+			TargetId = GetClosestId(g_Config.m_ShAimLaserFov, WReach);
 			break;
 	}
 
@@ -129,9 +131,10 @@ CSHAimbot::GetClosestTarget(EWeapon Weapon)
 	if (g_Config.m_ShDbg)
 		GameClient()->m_Helper.dbg_msg("bot", "bot: ValidClosestID");
 
-	const int LocalId = GetLocalId(GameClient());
-	const vec2 MyPos = GameClient()->m_aClients[LocalId].m_Predicted.m_Pos;
-	const vec2 MyVel = GameClient()->m_aClients[LocalId].m_Predicted.m_Vel;
+	const vec2 MyPos = GameClient()->m_aClients[LocalId].m_Active ?
+		GameClient()->m_aClients[LocalId].m_Predicted.m_Pos : vec2(0.f, 0.f);
+	const vec2 MyVel = GameClient()->m_aClients[LocalId].m_Active ?
+		GameClient()->m_aClients[LocalId].m_Predicted.m_Vel : vec2(0.f, 0.f);
 
 	const vec2 TargetPos = GameClient()->m_aClients[TargetId].m_Predicted.m_Pos;
 	const vec2 TargetVel = GameClient()->m_aClients[TargetId].m_Predicted.m_Vel;
@@ -147,10 +150,12 @@ CSHAimbot::GetClosestTarget(EWeapon Weapon)
 
 int CSHAimbot::GetClosestId(int Fov, float Range)
 {
-	const vec2 Pos = GameClient()->m_PredictedChar.m_Pos;
+	const int LocalId = GetLocalId(GameClient());
+	const vec2 MyPos = GameClient()->m_aClients[LocalId].m_Active ?
+		GameClient()->m_aClients[LocalId].m_Predicted.m_Pos : vec2(0.f, 0.f);
+	const CTuningParams* pTuning = GameClient()->m_Helper.GetTuningAt(MyPos);
 	float Distance = Range;
 	int ClosestID = -1;
-	const int LocalId = GetLocalId(GameClient());
 
 	const CGameClient::CClientData OwnClientData = GameClient()->m_aClients[LocalId];
 
@@ -175,7 +180,7 @@ int CSHAimbot::GetClosestId(int Fov, float Range)
 		if(!GameClient()->m_Teams.SameTeam(i, LocalId) || OwnClientData.m_HookHitDisabled)
 			continue;
 
-		if(!InFov(Fov, Position - Pos))
+		if(!InFov(Fov, Position - MyPos))
 			continue;
 
 		// FNG: Skip if Tee is frozen and current weapon is Laser
@@ -190,13 +195,13 @@ int CSHAimbot::GetClosestId(int Fov, float Range)
 		// FIX?: Only if Weapon is Hook?
 		static int s_LastHookedId = GameClient()->m_Snap.m_pLocalCharacter->m_HookedPlayer;
 		if(GameClient()->m_Helper.IsValidId(s_LastHookedId)
-		   && length(GameClient()->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < GameClient()->GetTuning(0)->m_HookLength + GetPhysSize() * 0.5f)
+		   && length(GameClient()->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < pTuning->m_HookLength + GetPhysSize() * 0.5f)
 			return ClosestID;
 
-		if(ClosestID == -1 && distance(Pos, Position) < Distance)
+		if(ClosestID == -1 && distance(MyPos, Position) < Distance)
 		{
 			ClosestID = i;
-			Distance = distance(Pos, Position);
+			Distance = distance(MyPos, Position);
 		}
 	}
 	return ClosestID;
@@ -382,7 +387,10 @@ float CSHAimbot::GetWeaponReach(EWeapon Weapon)
 		// TODO(horoni): Maybe there is a better way to detect shotgun mode?
 		case EWeapon::Shotgun: return GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace ? pTuning->m_LaserReach : 400.f;
 		case EWeapon::Grenade: return pTuning->m_GrenadeSpeed * pTuning->m_GrenadeLifetime;
-		case EWeapon::Laser: return pTuning->m_LaserReach;
+		case EWeapon::Laser:
+			if (pTuning->m_LaserReach < 1.f)
+				return 800.f;
+			return pTuning->m_LaserReach;
 	}
 }
 
