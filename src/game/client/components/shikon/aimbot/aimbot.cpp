@@ -210,6 +210,13 @@ float CSHAimbot::GetPing() const
 	return Ping;
 }
 
+float CSHAimbot::GetExtrapolationPing() const
+{
+	if (g_Config.m_ClAntiPing && g_Config.m_ClAntiPingPlayers)
+		return 0.f;
+	return GetPing();
+}
+
 // <><><> Helpers <><><><><>
 
 bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel)
@@ -217,7 +224,7 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 	float WSpeed = GetWeaponSpeed(Weapon);
 
 	if (WSpeed >= INSTANT_SPEED) {
-		TargetPos += TargetVel * GetPing();
+		TargetPos += TargetVel * GetExtrapolationPing();
 		return true;
 	}
 
@@ -240,7 +247,7 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 		else if (t2 > 0.f) Time = t2;
 
 		if (Time > 0.f) {
-			TargetPos += TargetVel * (Time + GetPing());
+			TargetPos += TargetVel * (Time + GetExtrapolationPing());
 			return true;
 		}
 	}
