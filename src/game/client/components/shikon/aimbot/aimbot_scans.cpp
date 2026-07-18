@@ -23,7 +23,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 
 	// If hitpoint scan is disabled and normal scan failed, return
 	if(!g_Config.m_ShAimHookEdge || Weapon != EWeapon::Hook)
-		return vec2(0, 0);
+		return std::nullopt;
 
 	/* Gets the angle we should be able to hook
 	 *
