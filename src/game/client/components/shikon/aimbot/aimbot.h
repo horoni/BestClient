@@ -29,7 +29,7 @@ public:
 
 	// Gets
     std::optional<CAimTargetInfo> GetClosestTarget(EWeapon Weapon);
-	int GetClosestId(int Fov = 360, float Range = 395.f);
+	int GetClosestId(EWeapon Weapon, int Fov, float Range);
 	[[nodiscard]] float GetPing() const;
 	[[nodiscard]] float GetExtrapolationPing() const;
 	float GetWeaponReach(EWeapon Weapon);

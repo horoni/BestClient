@@ -98,26 +98,25 @@ CSHAimbot::GetClosestTarget(EWeapon Weapon)
 
 	switch(Weapon) {
 		case EWeapon::Hook:
-			TargetId = GetClosestId(g_Config.m_ShAimHookFov, WReach);
+			TargetId = GetClosestId(Weapon, g_Config.m_ShAimHookFov, WReach);
 			break;
 		case EWeapon::Hammer:
-			TargetId = GetClosestId(g_Config.m_ShAimHammerFov, WReach);
+			TargetId = GetClosestId(Weapon, g_Config.m_ShAimHammerFov, WReach);
 			break;
 		case EWeapon::Gun:
-			TargetId = GetClosestId(g_Config.m_ShAimGunFov, WReach);
+			TargetId = GetClosestId(Weapon, g_Config.m_ShAimGunFov, WReach);
 			break;
 		case EWeapon::Shotgun:
 			if (GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace)
-				TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, GetWeaponReach(EWeapon::Laser) + 15.f);
-			else TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, WReach);
+				TargetId = GetClosestId(Weapon, g_Config.m_ShAimShotgunFov, GetWeaponReach(EWeapon::Laser) + 15.f);
+			else TargetId = GetClosestId(Weapon, g_Config.m_ShAimShotgunFov, WReach);
 			break;
 		case EWeapon::Grenade:
 			// TODO(horoni): Implement grenade prediction
-			TargetId = GetClosestId(g_Config.m_ShAimGrenadeFov, 1.f);
+			TargetId = GetClosestId(Weapon, g_Config.m_ShAimGrenadeFov, 1.f);
 			break;
 		case EWeapon::Laser:
-			// Range is shorter than 815 but we predicting
-			TargetId = GetClosestId(g_Config.m_ShAimLaserFov, WReach);
+			TargetId = GetClosestId(Weapon, g_Config.m_ShAimLaserFov, WReach);
 			break;
 	}
 
@@ -148,7 +147,7 @@ CSHAimbot::GetClosestTarget(EWeapon Weapon)
 	return CAimTargetInfo{TargetId, TargetPos, AimDir.value()};
 }
 
-int CSHAimbot::GetClosestId(int Fov, float Range)
+int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 {
 	const int LocalId = GetLocalId(GameClient());
 	const vec2 MyPos = GameClient()->m_aClients[LocalId].m_Active ?
@@ -183,11 +182,14 @@ int CSHAimbot::GetClosestId(int Fov, float Range)
 		if(!InFov(Fov, Position - MyPos))
 			continue;
 
+		const bool IsFrozen = (GameClient()->m_aClients[i].m_Predicted.m_FreezeEnd > 0 || GameClient()->m_aClients[i].m_Predicted.m_IsInFreeze);
 		// FNG: Skip if Tee is frozen and current weapon is Laser
-		if((GameClient()->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng)
-				&& GameClient()->m_Snap.m_pLocalCharacter->m_Weapon == (int)EWeapon::Laser
-				&& (GameClient()->m_aClients[i].m_Predicted.m_FreezeEnd > 0 || GameClient()->m_aClients[i].m_Predicted.m_IsInFreeze))
+		if (Weapon == EWeapon::Laser) {
+			if((GameClient()->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng) && IsFrozen)
 				continue;
+			if ((GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace && !g_Config.m_ShAimForceFng) && !IsFrozen)
+				continue;
+		}
 
 		if(ClosestID == -1 && distance(MyPos, Position) < Distance)
 		{
