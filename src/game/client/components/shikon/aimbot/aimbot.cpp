@@ -3,6 +3,8 @@
 #include "game/client/prediction/entities/character.h"
 #include <game/client/gameclient.h>
 
+#include <cmath>
+
 #define INSTANT_SPEED 10000.f
 
 void CSHAimbot::Aimbot()
@@ -212,25 +214,35 @@ float CSHAimbot::GetPing() const
 
 bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel)
 {
-	const vec2 Delta = TargetPos - MyPos;
-	const vec2 DeltaVel = TargetVel - MyVel;
-
 	float WSpeed = GetWeaponSpeed(Weapon);
 
-	const float WeaponSpeed = length(TargetVel) + WSpeed;
-	const float a = dot(DeltaVel, DeltaVel) - powf(WeaponSpeed, 2);
+	if (WSpeed >= INSTANT_SPEED) {
+		TargetPos += TargetVel * GetPing();
+		return true;
+	}
 
+	const vec2 Delta = TargetPos - MyPos;
+	const vec2 DeltaVel = TargetVel;
+
+	const float a = dot(DeltaVel, DeltaVel) - (WSpeed * WSpeed);
 	const float b = 2.f * dot(DeltaVel, Delta);
 	const float c = dot(Delta, Delta);
 
-	const float Sol = powf(b, 2) - 4.f * a * c;
-	if(Sol > 0.f)
+	const float Sol = (b * b) - 4.f * a * c;
+	if (Sol > 0.f)
 	{
-		// qTime is the same as time
-		// const float qTime = (-sqrt(sol) - b) / (2 * a);
-		const float Time = abs(2.f * c / (sqrtf(Sol) - b)) + GetPing();
-		TargetPos += TargetVel * Time;
-		return true;
+		float t1 = (-b - sqrtf(Sol)) / (2.f * a);
+		float t2 = (-b + sqrtf(Sol)) / (2.f * a);
+
+		float Time = -1.f;
+		if (t1 > 0.f && t2 > 0.f) Time = minimum(t1, t2);
+		else if (t1 > 0.f) Time = t1;
+		else if (t2 > 0.f) Time = t2;
+
+		if (Time > 0.f) {
+			TargetPos += TargetVel * (Time + GetPing());
+			return true;
+		}
 	}
 	return false;
 }
@@ -337,11 +349,17 @@ void CSHAimbot::Aim(vec2 Pos)
 bool CSHAimbot::InFov(float Fov, vec2 Dir)
 {
 	const int LocalDataId = GetLocalData();
-	const float DifferenceAngle = abs(atan2(sin(angle(Dir) - angle(GameClient()->m_Controls.m_aMousePos[LocalDataId])),
-		cos(angle(Dir) - angle(GameClient()->m_Controls.m_aMousePos[LocalDataId])))) * 100.f;
-	if(DifferenceAngle > Fov)
-		return false;
-	return true;
+	const vec2 MousePos = GameClient()->m_Controls.m_aMousePos[LocalDataId];
+	float MouseAngle = angle(MousePos);
+	float DirAngle = angle(Dir);
+	float Diff = std::abs(MouseAngle - DirAngle);
+
+	while(Diff > pi) Diff -= 2.f * pi;
+	while(Diff < -pi) Diff += 2.f * pi;
+	Diff = std::abs(Diff);
+
+	float DiffDeg = Diff * 180.f / pi;
+	return DiffDeg <= (Fov / 2.f);
 }
 
 float CSHAimbot::GetWeaponReach(EWeapon Weapon)
