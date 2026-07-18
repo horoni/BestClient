@@ -52,7 +52,7 @@ void CSHHelper::dbg_msg(const char *Sys, const char *Fmt, ...)
 	va_start(Args, Fmt);
 	CLogMessage Msg;
 	Msg.m_Level = LEVEL_INFO;
-	str_timestamp_format(Msg.m_aTimestamp, sizeof(Msg.m_aTimestamp), FORMAT_SPACE);
+	str_timestamp_format(Msg.m_aTimestamp, sizeof(Msg.m_aTimestamp), TimestampFormat::SPACE);
 	Msg.m_TimestampLength = str_length(Msg.m_aTimestamp);
 	str_copy(Msg.m_aSystem, Sys);
 	Msg.m_SystemLength = str_length(Msg.m_aSystem);
