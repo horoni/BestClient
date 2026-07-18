@@ -15,6 +15,17 @@ int CSHHelper::GetCustomTile(float x, float y) const
 	return GameClient()->Collision()->GetTiles()[Pos].m_Index;
 }
 
+const CTuningParams* CSHHelper::GetTuningAt(vec2 Pos)
+{
+	int TuneZone = 0;
+
+	if (Client()->State() == IClient::STATE_ONLINE && GameClient()->m_GameWorld.m_WorldConfig.m_UseTuneZones)
+	{
+		TuneZone = GameClient()->Collision()->IsTune(GameClient()->Collision()->GetMapIndex(Pos));
+	}
+
+	return GameClient()->GetTuning(TuneZone);
+}
 
 bool CSHHelper::IsGrounded(int Id, vec2 Pos)
 {

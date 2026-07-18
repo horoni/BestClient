@@ -23,7 +23,7 @@ Pull Requests are welcome
  - [ ] Maybe there is a better way to detect shotgun mode?
 
 ### Fixes
- - [ ] Use Local Tuning instead Global
+ - [x] Use Local Tuning instead Global
 
 ### Credits
 Thanks to:

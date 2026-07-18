@@ -52,8 +52,9 @@ void CSHVisuals::DrawFovLines(int Fov, ColorHSLA Color) {
 	const float DwAngle = Angle + FovRadians / 2;
 
 	const vec2 MyPos = GameClient()->m_LocalCharacterPos;
-	vec2 UpPos = MyPos + direction(UpAngle) * (GameClient()->GetTuning(0)->m_HookLength);
-	vec2 DwPos = MyPos + direction(DwAngle) * (GameClient()->GetTuning(0)->m_HookLength);
+	const float HookLength = GameClient()->m_Helper.GetTuningAt(MyPos)->m_HookLength;
+	vec2 UpPos = MyPos + direction(UpAngle) * (HookLength);
+	vec2 DwPos = MyPos + direction(DwAngle) * (HookLength);
 
 	Collision()->IntersectLine(MyPos, UpPos, &UpPos, nullptr);
 	Collision()->IntersectLine(MyPos, DwPos, &DwPos, nullptr);

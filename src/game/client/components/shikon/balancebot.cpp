@@ -15,7 +15,8 @@ void CSHBalanceBot::Balance()
 	const vec2 Vel = Client.m_Predicted.m_Vel;
 	const vec2 PredPos = Pos + Vel;
 
-	const auto MayTarget = FindTarget(PredPos, GameClient()->GetTuning(0)->m_HookLength);
+	// 380 is default hook length
+	const auto MayTarget = FindTarget(PredPos, 380.f);
 	if (!MayTarget.has_value()) return;
 
 	const auto& Target = MayTarget.value();

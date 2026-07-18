@@ -4,6 +4,7 @@
 #include <base/system.h>
 #include <base/vmath.h>
 #include <game/client/component.h>
+#include <game/gamecore.h>
 
 #include <memory>
 
@@ -13,6 +14,7 @@ public:
 	int Sizeof() const override { return sizeof(*this); }
 
 	int GetCustomTile(float x, float y) const;
+	const CTuningParams* GetTuningAt(vec2 Pos);
 
 	bool IsLocalActive();
 	bool IsValidId(int Id);

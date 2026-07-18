@@ -371,26 +371,34 @@ bool CSHAimbot::InFov(float Fov, vec2 Dir)
 
 float CSHAimbot::GetWeaponReach(EWeapon Weapon)
 {
+	const vec2 MyPos = GameClient()->m_Snap.m_pLocalCharacter ?
+		vec2(GameClient()->m_Snap.m_pLocalCharacter->m_X, GameClient()->m_Snap.m_pLocalCharacter->m_Y) : vec2(0.f, 0.f);
+	const CTuningParams* pTuning = GameClient()->m_Helper.GetTuningAt(MyPos);
+
 	switch (Weapon) {
-		case EWeapon::Hook: return GameClient()->GetTuning(0)->m_HookLength;
+		case EWeapon::Hook: return pTuning->m_HookLength;
 		case EWeapon::Hammer: return 63.f;
-		case EWeapon::Gun: return GameClient()->GetTuning(0)->m_GunSpeed * GameClient()->GetTuning(0)->m_GunLifetime;
+		case EWeapon::Gun: return pTuning->m_GunSpeed * pTuning->m_GunLifetime;
 		// TODO(horoni): Maybe there is a better way to detect shotgun mode?
-		case EWeapon::Shotgun: return GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace ? GameClient()->GetTuning(0)->m_LaserReach : 400.f;
-		case EWeapon::Grenade: return GameClient()->GetTuning(0)->m_GrenadeSpeed * GameClient()->GetTuning(0)->m_GrenadeLifetime;
-		case EWeapon::Laser: return GameClient()->GetTuning(0)->m_LaserReach;
+		case EWeapon::Shotgun: return GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace ? pTuning->m_LaserReach : 400.f;
+		case EWeapon::Grenade: return pTuning->m_GrenadeSpeed * pTuning->m_GrenadeLifetime;
+		case EWeapon::Laser: return pTuning->m_LaserReach;
 	}
 }
 
 float CSHAimbot::GetWeaponSpeed(EWeapon Weapon)
 {
+	const vec2 MyPos = GameClient()->m_Snap.m_pLocalCharacter ?
+		vec2(GameClient()->m_Snap.m_pLocalCharacter->m_X, GameClient()->m_Snap.m_pLocalCharacter->m_Y) : vec2(0.f, 0.f);
+	const CTuningParams* pTuning = GameClient()->m_Helper.GetTuningAt(MyPos);
+
 	switch (Weapon) {
-		case EWeapon::Hook: return GameClient()->GetTuning(0)->m_HookFireSpeed;
+		case EWeapon::Hook: return pTuning->m_HookFireSpeed;
 		case EWeapon::Hammer: return INSTANT_SPEED;
-		case EWeapon::Gun: return GameClient()->GetTuning(0)->m_GunSpeed;
+		case EWeapon::Gun: return pTuning->m_GunSpeed;
 		// TODO(horoni): Maybe there is a better way to detect shotgun mode?
-		case EWeapon::Shotgun: return GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace ? INSTANT_SPEED : GameClient()->GetTuning(0)->m_ShotgunSpeed;
-		case EWeapon::Grenade: return GameClient()->GetTuning(0)->m_GrenadeSpeed;
+		case EWeapon::Shotgun: return GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace ? INSTANT_SPEED : pTuning->m_ShotgunSpeed;
+		case EWeapon::Grenade: return pTuning->m_GrenadeSpeed;
 		case EWeapon::Laser: return INSTANT_SPEED;
 	}
 }
