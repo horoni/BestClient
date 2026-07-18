@@ -189,15 +189,6 @@ int CSHAimbot::GetClosestId(int Fov, float Range)
 				&& (GameClient()->m_aClients[i].m_Predicted.m_FreezeEnd > 0 || GameClient()->m_aClients[i].m_Predicted.m_IsInFreeze))
 				continue;
 
-		if(ClosestID != -1 && GameClient()->m_GameWorld.m_GameTick % 150 != 0)
-			return ClosestID;
-
-		// FIX?: Only if Weapon is Hook?
-		static int s_LastHookedId = GameClient()->m_Snap.m_pLocalCharacter->m_HookedPlayer;
-		if(GameClient()->m_Helper.IsValidId(s_LastHookedId)
-		   && length(GameClient()->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < pTuning->m_HookLength + GetPhysSize() * 0.5f)
-			return ClosestID;
-
 		if(ClosestID == -1 && distance(MyPos, Position) < Distance)
 		{
 			ClosestID = i;
