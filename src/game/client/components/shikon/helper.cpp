@@ -22,11 +22,11 @@ bool CSHHelper::IsGrounded(int Id, vec2 Pos)
 		return false;
 	if(Pos == vec2(0, 0))
 		Pos = GameClient()->m_aClients[Id].m_Predicted.m_Pos;
-	if(GameClient()->Collision()->CheckPoint(Pos.x + PHYS_SIZE / 2, Pos.y + PHYS_SIZE / 2 + 5))
+	if(GameClient()->Collision()->CheckPoint(Pos.x + GetPhysSize() / 2, Pos.y + GetPhysSize() / 2 + 5))
 		return true;
-	if(GameClient()->Collision()->CheckPoint(Pos.x - PHYS_SIZE / 2, Pos.y + PHYS_SIZE / 2 + 5))
+	if(GameClient()->Collision()->CheckPoint(Pos.x - GetPhysSize() / 2, Pos.y + GetPhysSize() / 2 + 5))
 		return true;
-	int MoveRestrictionsBelow = GameClient()->Collision()->GetMoveRestrictions(Pos + vec2(0, PHYS_SIZE / 2 + 4), 0.0f);
+	int MoveRestrictionsBelow = GameClient()->Collision()->GetMoveRestrictions(Pos + vec2(0, GetPhysSize() / 2 + 4), 0.0f);
 	if(MoveRestrictionsBelow & CANTMOVE_DOWN)
 		return true;
 	return false;
@@ -34,7 +34,7 @@ bool CSHHelper::IsGrounded(int Id, vec2 Pos)
 
 bool CSHHelper::IsLocalActive()
 {
-	if(GameClient()->m_Controls.m_aInputData[LOCAL].m_PlayerFlags & PLAYERFLAG_PLAYING && Client()->State() == IClient::STATE_ONLINE)
+	if(GameClient()->m_Controls.m_aInputData[GetLocalData()].m_PlayerFlags & PLAYERFLAG_PLAYING && Client()->State() == IClient::STATE_ONLINE)
 		return true;
 	return false;
 }

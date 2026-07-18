@@ -1,28 +1,23 @@
+#include <optional>
+
 #include "game/client/components/shikon/aimbot/aimbot.h"
 #include "game/client/components/shikon/defs.h"
-#include "game/client/prediction/gameworld.h"
 #include <engine/shared/config.h>
 
 #define MAX_HITPOINTS 32
 
-vec2 CSHAimbot::EdgeScan(EWeapon Weapon)
+std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, vec2 TargetPos, vec2 TargetVel)
 {
 	int HitPointsCount = 0;
 	vec2 HitPoints[MAX_HITPOINTS];
 
-	vec2 MyPos = m_MyPos;
-	vec2 TargetPos = m_TargetPos;
-
-	m_TargetVisible = false;
-
 	// Predict hook and return, if it's impossible
-	if(!PredictWeapon(Weapon, MyPos, m_MyVel, TargetPos, m_TargetVel))
-		return vec2(0, 0);
+	if(!PredictWeapon(Weapon, MyPos, MyVel, TargetPos, TargetVel))
+		return std::nullopt;
 
 	// If player is hookable right away, return the position
 	if(HitScanWeapon(Weapon, MyPos, TargetPos, TargetPos - MyPos))
 	{
-		m_TargetVisible = true;
 		return TargetPos - MyPos;
 	}
 
@@ -49,8 +44,8 @@ vec2 CSHAimbot::EdgeScan(EWeapon Weapon)
 			break;
 
 		// Convert desired angle(hitpoint) to Cartesian coordinates
-		auto Pos = vec2(static_cast<int>(TargetPos.x + cosf(i) * PHYS_SIZE),
-			static_cast<int>(TargetPos.y + sinf(i) * PHYS_SIZE));
+		auto Pos = vec2(static_cast<int>(TargetPos.x + cosf(i) * GetPhysSize()),
+			static_cast<int>(TargetPos.y + sinf(i) * GetPhysSize()));
 		const vec2 Dir = Pos - MyPos;
 
 		// Check if hitpoint is hookable and if it is
@@ -68,10 +63,7 @@ vec2 CSHAimbot::EdgeScan(EWeapon Weapon)
 	{
 		// Calculate the middle index of `hitPoints` array
 		const int MiddleIndex = (HitPointsCount - 1) / 2;
-		m_TargetVisible = true;
-		m_TargetPos = HitPoints[MiddleIndex];
 		return HitPoints[MiddleIndex];
 	}
-	return vec2(0, 0);
+	return std::nullopt;
 }
-

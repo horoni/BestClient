@@ -1,8 +1,7 @@
 ﻿#include "game/client/components/shikon/aimbot/aimbot.h"
-#include "game/client/components/shikon/helper.h"
+#include "game/client/components/shikon/defs.h"
 #include "game/client/prediction/entities/character.h"
 #include <game/client/gameclient.h>
-#include "game/client/components/shikon/defs.h"
 
 #define INSTANT_SPEED 10000.f
 
@@ -22,35 +21,39 @@ void CSHAimbot::Aimbot()
 			return;
 	}
 
-	if(GameClient()->m_Controls.m_aInputData[LOCAL].m_Hook == 1 && g_Config.m_ShAimHook)
+	const int LocalDataId = GetLocalData();
+
+	if(GameClient()->m_Controls.m_aInputData[LocalDataId].m_Hook == 1 && g_Config.m_ShAimHook)
 	{
-		GetClosestHitpoint(EWeapon::Hook);
-		Aim(NormalizeAim(m_TargetPos));
-	} else if (GameClient()->m_Controls.m_aInputData[LOCAL].m_Fire % 2 == 1)
+		auto Target = GetClosestTarget(EWeapon::Hook);
+		if (Target.has_value())
+			Aim(NormalizeAim(Target->m_AimDir));
+	} else if (GameClient()->m_Controls.m_aInputData[LocalDataId].m_Fire % 2 == 1)
 	{
 		if (g_Config.m_ShAimLaserAuto && Weapon == EWeapon::Laser)
 			return;
 
-		GetClosestHitpoint(Weapon);
+		auto Target = GetClosestTarget(Weapon);
 
-		if (g_Config.m_ShDbg) {
+		if (g_Config.m_ShDbg && Target.has_value()) {
 			GameClient()->m_Helper.dbg_msg("bot", "bot: fire = %d; cursor w = %d; snap w = %d",
-				GameClient()->m_Controls.m_aInputData[LOCAL].m_Fire,
+				GameClient()->m_Controls.m_aInputData[LocalDataId].m_Fire,
 				GameClient()->m_CursorInfo.Weapon(),
 				GameClient()->m_Snap.m_pLocalCharacter ?
 				GameClient()->m_Snap.m_pLocalCharacter->m_Weapon : -1
 			);
 			GameClient()->m_Helper.dbg_msg("bot", "bot: closest_hitpoint = %f %f",
-				m_TargetPos.x, m_TargetPos.y);
+				Target->m_AimDir.x, Target->m_AimDir.y);
 		}
 
-		if ( (Weapon == EWeapon::Hammer && g_Config.m_ShAimHammer)
+		if ( Target.has_value() &&
+			 ((Weapon == EWeapon::Hammer && g_Config.m_ShAimHammer)
 			|| (Weapon == EWeapon::Gun && g_Config.m_ShAimGun)
 			|| (Weapon == EWeapon::Shotgun && g_Config.m_ShAimShotgun)
 			|| (Weapon == EWeapon::Grenade && g_Config.m_ShAimGrenade)
 			|| (Weapon == EWeapon::Laser && g_Config.m_ShAimLaser)
-		) {
-			Aim(NormalizeAim(m_TargetPos));
+			 )) {
+			Aim(NormalizeAim(Target->m_AimDir));
 		}
 	}
 	else
@@ -60,78 +63,85 @@ void CSHAimbot::Aimbot()
 bool CSHAimbot::AutoLaser()
 {
 	static bool s_Fired = false;
+	const int LocalDataId = GetLocalData();
 
 	if (s_Fired)
 	{
-		GameClient()->m_Controls.m_aLastData[LOCAL].m_Fire = 0;
-		GameClient()->m_Controls.m_aInputData[LOCAL].m_Fire = 0;
+		GameClient()->m_Controls.m_aLastData[LocalDataId].m_Fire = 0;
+		GameClient()->m_Controls.m_aInputData[LocalDataId].m_Fire = 0;
 		s_Fired = false;
 		return false;
 	}
 
-	if (GameClient()->m_GameWorld.GetCharacterById(LOCAL_ID)->GetReloadTimer() > 0)
+	if (GameClient()->m_GameWorld.GetCharacterById(GetLocalId(GameClient()))->GetReloadTimer() > 0)
 		return false;
 
-	GetClosestHitpoint(EWeapon::Laser);
-	if (!m_TargetVisible)
+	auto Target = GetClosestTarget(EWeapon::Laser);
+	if (!Target.has_value())
 		return false;
 
-	Aim(NormalizeAim(m_TargetPos));
-	GameClient()->m_Controls.m_aInputData[LOCAL].m_Fire = 1;
+	Aim(NormalizeAim(Target->m_AimDir));
+	GameClient()->m_Controls.m_aInputData[LocalDataId].m_Fire = 1;
 	s_Fired = true;
 
 	return true;
 }
 
-void CSHAimbot::GetClosestHitpoint(EWeapon Weapon)
+std::optional<CSHAimbot::CAimTargetInfo>
+CSHAimbot::GetClosestTarget(EWeapon Weapon)
 {
+	int TargetId = -1;
+
 	switch(Weapon) {
 		case EWeapon::Hook:
-			m_TargetId = GetClosestId(g_Config.m_ShAimHookFov);
+			TargetId = GetClosestId(g_Config.m_ShAimHookFov);
 			break;
 		case EWeapon::Hammer:
-			m_TargetId = GetClosestId(g_Config.m_ShAimHammerFov, 21.f);
+			TargetId = GetClosestId(g_Config.m_ShAimHammerFov, 21.f);
 			break;
 		case EWeapon::Gun:
-			m_TargetId = GetClosestId(g_Config.m_ShAimGunFov, 815.f);
+			TargetId = GetClosestId(g_Config.m_ShAimGunFov, 815.f);
 			break;
 		case EWeapon::Shotgun:
 			if (GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace)
-				m_TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, GameClient()->GetTuning(0)->m_LaserReach + 15.f);
-			else m_TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, 415.f);
+				TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, GameClient()->GetTuning(0)->m_LaserReach + 15.f);
+			else TargetId = GetClosestId(g_Config.m_ShAimShotgunFov, 415.f);
 			break;
 		case EWeapon::Grenade:
 			// TODO(horoni): Implement grenade prediction
-			m_TargetId = GetClosestId(g_Config.m_ShAimGrenadeFov, 1.f);
+			TargetId = GetClosestId(g_Config.m_ShAimGrenadeFov, 1.f);
 			break;
 		case EWeapon::Laser:
 			// Range is shorter than 815 but we predicting
-			m_TargetId = GetClosestId(g_Config.m_ShAimLaserFov, GameClient()->GetTuning(0)->m_LaserReach + 15.f);
+			TargetId = GetClosestId(g_Config.m_ShAimLaserFov, GameClient()->GetTuning(0)->m_LaserReach + 15.f);
 			break;
 	}
 
-	if(!GameClient()->m_Helper.IsValidId(m_TargetId) || !GameClient()->m_Snap.m_pLocalCharacter)
+	if(!GameClient()->m_Helper.IsValidId(TargetId) || !GameClient()->m_Snap.m_pLocalCharacter)
 	{
 		if (g_Config.m_ShDbg)
 			GameClient()->m_Helper.dbg_msg("bot", "bot: InvalidClosestID");
-		m_TargetPos = vec2(0.f, 0.f);
-		m_TargetVel = vec2(0, 0);
-		m_TargetVisible = false;
-		m_TargetId = -1;
-		return;
+		return std::nullopt;
 	}
 
 	if (g_Config.m_ShDbg)
 		GameClient()->m_Helper.dbg_msg("bot", "bot: ValidClosestID");
 
-	m_MyPos = vec2(GameClient()->m_Snap.m_pLocalCharacter->m_X,
+	const vec2 MyPos = vec2(GameClient()->m_Snap.m_pLocalCharacter->m_X,
 		GameClient()->m_Snap.m_pLocalCharacter->m_Y);
-	m_MyVel = vec2(GameClient()->m_Snap.m_pLocalCharacter->m_VelX,
+	const vec2 MyVel = vec2(GameClient()->m_Snap.m_pLocalCharacter->m_VelX,
 		GameClient()->m_Snap.m_pLocalCharacter->m_VelY);
 
-	m_TargetPos = GameClient()->m_aClients[m_TargetId].m_Predicted.m_Pos;
-	m_TargetVel = GameClient()->m_aClients[m_TargetId].m_Predicted.m_Vel;
-	m_TargetPos = EdgeScan(Weapon);
+	const vec2 TargetPos = GameClient()->m_aClients[TargetId].m_Predicted.m_Pos;
+	const vec2 TargetVel = GameClient()->m_aClients[TargetId].m_Predicted.m_Vel;
+
+	std::optional<vec2> AimDir = EdgeScan(Weapon, MyPos, MyVel, TargetPos, TargetVel);
+
+	if (!AimDir.has_value()) {
+		return std::nullopt;
+	}
+
+	return CAimTargetInfo{TargetId, TargetPos, AimDir.value()};
 }
 
 int CSHAimbot::GetClosestId(int Fov, float Range)
@@ -139,14 +149,15 @@ int CSHAimbot::GetClosestId(int Fov, float Range)
 	const vec2 Pos = GameClient()->m_PredictedChar.m_Pos;
 	float Distance = Range;
 	int ClosestID = -1;
+	const int LocalId = GetLocalId(GameClient());
 
-	const CGameClient::CClientData OwnClientData = GameClient()->m_aClients[LOCAL_ID];
+	const CGameClient::CClientData OwnClientData = GameClient()->m_aClients[LocalId];
 
 	auto *Player = dynamic_cast<CCharacter *>(GameClient()->m_GameWorld.FindFirst(GameClient()->m_GameWorld.ENTTYPE_CHARACTER));
 	for(; Player; Player = dynamic_cast<CCharacter *>(Player->TypeNext()))
 	{
 		int i = Player->GetId();
-		if(i == LOCAL_ID || !Player)
+		if(i == LocalId || !Player)
 			continue;
 
 		const CGameClient::CClientData ClData = GameClient()->m_aClients[i];
@@ -160,7 +171,7 @@ int CSHAimbot::GetClosestId(int Fov, float Range)
 		if(IsOneSpec || IsOneSolo)
 			continue;
 
-		if(!GameClient()->m_Teams.SameTeam(i, LOCAL_ID) || OwnClientData.m_HookHitDisabled)
+		if(!GameClient()->m_Teams.SameTeam(i, LocalId) || OwnClientData.m_HookHitDisabled)
 			continue;
 
 		if(!InFov(Fov, Position - Pos))
@@ -178,7 +189,7 @@ int CSHAimbot::GetClosestId(int Fov, float Range)
 		// FIX?: Only if Weapon is Hook?
 		static int s_LastHookedId = GameClient()->m_Snap.m_pLocalCharacter->m_HookedPlayer;
 		if(GameClient()->m_Helper.IsValidId(s_LastHookedId)
-				&& length(GameClient()->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < GameClient()->GetTuning(0)->m_HookLength + PHYS_SIZE * 0.5f)
+		   && length(GameClient()->m_aClients[s_LastHookedId].m_Predicted.m_Pos - ClData.m_Predicted.m_Pos) < GameClient()->GetTuning(0)->m_HookLength + GetPhysSize() * 0.5f)
 			return ClosestID;
 
 		if(ClosestID == -1 && distance(Pos, Position) < Distance)
@@ -231,9 +242,9 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 	float WReach = GetWeaponReach(Weapon);
 
 	vec2 ExDirection = normalize(ScanDir);
-	vec2 FinishPos = InitPos + ExDirection * (WReach - PHYS_SIZE * 1.5f);
+	vec2 FinishPos = InitPos + ExDirection * (WReach - GetPhysSize() * 1.5f);
 
-	vec2 OldPos = InitPos + ExDirection * PHYS_SIZE * 1.5f;
+	vec2 OldPos = InitPos + ExDirection * GetPhysSize() * 1.5f;
 	vec2 NewPos = OldPos;
 
 	bool DoBreak = false;
@@ -277,7 +288,7 @@ bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 	vec2 ClosestPoint;
 	if(closest_point_on_line(HookPos, NewPos, TargetPos, ClosestPoint))
 	{
-		if(distance(TargetPos, ClosestPoint) < PHYS_SIZE + 2.f)
+		if(distance(TargetPos, ClosestPoint) < GetPhysSize() + 2.f)
 		{
 			NewPos = ClosestPoint;
 			return true;
@@ -304,31 +315,30 @@ void CSHAimbot::Aim(vec2 Pos)
 {
 	if(!m_CanAim)
 		return;
+	const int LocalDataId = GetLocalData();
 
 	// Aimbot will aim -> update `m_CanAim`
 	m_CanAim = false;
 
-	if(!m_TargetVisible)
-		return;
-
 	// Aim using desired way
 	if(!g_Config.m_ShAimSilent)
 	{
-		GameClient()->m_Controls.m_aMousePos[LOCAL] = Pos;
-		GameClient()->m_Controls.m_aInputData[LOCAL].m_TargetX = static_cast<int>(GameClient()->m_Controls.m_aMousePos[LOCAL].x);
-		GameClient()->m_Controls.m_aInputData[LOCAL].m_TargetY = static_cast<int>(GameClient()->m_Controls.m_aMousePos[LOCAL].y);
+		GameClient()->m_Controls.m_aMousePos[LocalDataId] = Pos;
+		GameClient()->m_Controls.m_aInputData[LocalDataId].m_TargetX = static_cast<int>(GameClient()->m_Controls.m_aMousePos[LocalDataId].x);
+		GameClient()->m_Controls.m_aInputData[LocalDataId].m_TargetY = static_cast<int>(GameClient()->m_Controls.m_aMousePos[LocalDataId].y);
 	}
 	else
 	{
-		GameClient()->m_Controls.m_aInputData[LOCAL].m_TargetX = static_cast<int>(Pos.x);
-		GameClient()->m_Controls.m_aInputData[LOCAL].m_TargetY = static_cast<int>(Pos.y);
+		GameClient()->m_Controls.m_aInputData[LocalDataId].m_TargetX = static_cast<int>(Pos.x);
+		GameClient()->m_Controls.m_aInputData[LocalDataId].m_TargetY = static_cast<int>(Pos.y);
 	}
 }
 
 bool CSHAimbot::InFov(float Fov, vec2 Dir)
 {
-	const float DifferenceAngle = abs(atan2(sin(angle(Dir) - angle(GameClient()->m_Controls.m_aMousePos[LOCAL])),
-		cos(angle(Dir) - angle(GameClient()->m_Controls.m_aMousePos[LOCAL])))) * 100.f;
+	const int LocalDataId = GetLocalData();
+	const float DifferenceAngle = abs(atan2(sin(angle(Dir) - angle(GameClient()->m_Controls.m_aMousePos[LocalDataId])),
+		cos(angle(Dir) - angle(GameClient()->m_Controls.m_aMousePos[LocalDataId])))) * 100.f;
 	if(DifferenceAngle > Fov)
 		return false;
 	return true;

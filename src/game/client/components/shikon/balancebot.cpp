@@ -8,8 +8,9 @@ void CSHBalanceBot::Balance()
 {
 	if (!g_Config.m_ShBalance || !GameClient()->m_Snap.m_pLocalCharacter)
 		return;
+	const int LocalDataId = GetLocalData();
 
-	const auto& Client = GameClient()->m_aClients[LOCAL_ID];
+	const auto& Client = GameClient()->m_aClients[GetLocalId(GameClient())];
 	const vec2 Pos = Client.m_Predicted.m_Pos;
 	const vec2 Vel = Client.m_Predicted.m_Vel;
 	const vec2 PredPos = Pos + Vel;
@@ -24,8 +25,8 @@ void CSHBalanceBot::Balance()
 	if (std::abs(XDist) > StopDist)
 	{
 		const int Dir = (XDist > 0) ? -1 : 1;
-		GameClient()->m_Controls.m_aInputData[LOCAL].m_Direction = Dir;
-	} else GameClient()->m_Controls.m_aInputData[LOCAL].m_Direction = 0;
+		GameClient()->m_Controls.m_aInputData[LocalDataId].m_Direction = Dir;
+	} else GameClient()->m_Controls.m_aInputData[LocalDataId].m_Direction = 0;
 }
 
 bool CSHBalanceBot::IsValidVerticalPosition(const vec2& TargetPos, const vec2& LocalPos) const

@@ -46,7 +46,7 @@ void CSHVisuals::DrawFov()
 
 void CSHVisuals::DrawFovLines(int Fov, ColorHSLA Color) {
 	ColorRGBA Col = color_cast<ColorRGBA>(Color);
-	const float Angle = angle(GameClient()->m_Controls.m_aMousePos[LOCAL]);
+	const float Angle = angle(GameClient()->m_Controls.m_aMousePos[GetLocalData()]);
 	const float FovRadians = (Fov * pi) / 180.f;
 	const float UpAngle = Angle - FovRadians / 2;
 	const float DwAngle = Angle + FovRadians / 2;

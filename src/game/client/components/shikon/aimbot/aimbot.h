@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <game/client/component.h>
 
 enum class EWeapon {
@@ -16,11 +18,17 @@ class CSHAimbot : public CComponent
 public:
 	int Sizeof() const override { return sizeof(*this); }
 
+    struct CAimTargetInfo {
+        int m_Id;
+        vec2 m_Pos;
+        vec2 m_AimDir;
+    };
+
 	void Aimbot();
 	bool AutoLaser();
 
 	// Gets
-	void GetClosestHitpoint(EWeapon Weapon);
+    std::optional<CAimTargetInfo> GetClosestTarget(EWeapon Weapon);
 	int GetClosestId(int Fov = 360, float Range = 395.f);
 	[[nodiscard]] float GetPing() const;
 	float GetWeaponReach(EWeapon Weapon);
@@ -32,7 +40,7 @@ public:
 	bool IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos);
 
 	// Scans
-	vec2 EdgeScan(EWeapon Weapon);
+    std::optional<vec2> EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, vec2 TargetPos, vec2 TargetVel);
 
 	// Aim
 	vec2 NormalizeAim(vec2 Pos);
@@ -43,11 +51,4 @@ public:
 
 	// Globals
 	bool m_CanAim = true;
-	bool m_TargetVisible = false;
-	int m_TargetId = 0;
-
-	vec2 m_MyPos = vec2(0, 0);
-	vec2 m_MyVel = vec2(0, 0);
-	vec2 m_TargetPos = vec2(0, 0);
-	vec2 m_TargetVel = vec2(0, 0);
 };
