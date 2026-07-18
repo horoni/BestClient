@@ -129,10 +129,9 @@ CSHAimbot::GetClosestTarget(EWeapon Weapon)
 	if (g_Config.m_ShDbg)
 		GameClient()->m_Helper.dbg_msg("bot", "bot: ValidClosestID");
 
-	const vec2 MyPos = vec2(GameClient()->m_Snap.m_pLocalCharacter->m_X,
-		GameClient()->m_Snap.m_pLocalCharacter->m_Y);
-	const vec2 MyVel = vec2(GameClient()->m_Snap.m_pLocalCharacter->m_VelX,
-		GameClient()->m_Snap.m_pLocalCharacter->m_VelY);
+	const int LocalId = GetLocalId(GameClient());
+	const vec2 MyPos = GameClient()->m_aClients[LocalId].m_Predicted.m_Pos;
+	const vec2 MyVel = GameClient()->m_aClients[LocalId].m_Predicted.m_Vel;
 
 	const vec2 TargetPos = GameClient()->m_aClients[TargetId].m_Predicted.m_Pos;
 	const vec2 TargetVel = GameClient()->m_aClients[TargetId].m_Predicted.m_Vel;
@@ -371,8 +370,9 @@ bool CSHAimbot::InFov(float Fov, vec2 Dir)
 
 float CSHAimbot::GetWeaponReach(EWeapon Weapon)
 {
-	const vec2 MyPos = GameClient()->m_Snap.m_pLocalCharacter ?
-		vec2(GameClient()->m_Snap.m_pLocalCharacter->m_X, GameClient()->m_Snap.m_pLocalCharacter->m_Y) : vec2(0.f, 0.f);
+	const int LocalId = GetLocalId(GameClient());
+	const vec2 MyPos = GameClient()->m_aClients[LocalId].m_Active ?
+		GameClient()->m_aClients[LocalId].m_Predicted.m_Pos : vec2(0.f, 0.f);
 	const CTuningParams* pTuning = GameClient()->m_Helper.GetTuningAt(MyPos);
 
 	switch (Weapon) {
@@ -388,8 +388,9 @@ float CSHAimbot::GetWeaponReach(EWeapon Weapon)
 
 float CSHAimbot::GetWeaponSpeed(EWeapon Weapon)
 {
-	const vec2 MyPos = GameClient()->m_Snap.m_pLocalCharacter ?
-		vec2(GameClient()->m_Snap.m_pLocalCharacter->m_X, GameClient()->m_Snap.m_pLocalCharacter->m_Y) : vec2(0.f, 0.f);
+	const int LocalId = GetLocalId(GameClient());
+	const vec2 MyPos = GameClient()->m_aClients[LocalId].m_Active ?
+		GameClient()->m_aClients[LocalId].m_Predicted.m_Pos : vec2(0.f, 0.f);
 	const CTuningParams* pTuning = GameClient()->m_Helper.GetTuningAt(MyPos);
 
 	switch (Weapon) {
