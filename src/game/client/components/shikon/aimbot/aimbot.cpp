@@ -314,7 +314,7 @@ bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 	vec2 ClosestPoint;
 	if(closest_point_on_line(HookPos, NewPos, TargetPos, ClosestPoint))
 	{
-		if(distance(TargetPos, ClosestPoint) < GetPhysSize() + 2.f)
+		if(distance(TargetPos, ClosestPoint) < GetPhysSize())
 		{
 			NewPos = ClosestPoint;
 			return true;
