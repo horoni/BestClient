@@ -272,9 +272,8 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 	ExDirection.y = round_to_int(ExDirection.y * 256.0f) / 256.0f;
 	ExDirection = normalize(ExDirection);
 
-	vec2 FinishPos = InitPos + ExDirection * (WReach - GetPhysSize() * 1.5f);
-
-	vec2 OldPos = InitPos + ExDirection * GetPhysSize() * 1.5f;
+	vec2 FinishPos = InitPos + ExDirection * WReach;
+	vec2 OldPos = InitPos + ExDirection * GetPhysSize();
 	vec2 NewPos = OldPos;
 
 	bool DoBreak = false;
