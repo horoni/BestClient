@@ -317,8 +317,9 @@ bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 bool CSHAimbot::IsPlayerFrozen(int TargetId)
 {
 	const auto& ClData = GameClient()->m_aClients[TargetId];
+	int CurTick = Client()->PredGameTick(GetLocalData());
 
-	if (ClData.m_Predicted.m_FreezeEnd > 0 || ClData.m_Predicted.m_IsInFreeze)
+	if (ClData.m_Predicted.m_FreezeEnd > CurTick || ClData.m_Predicted.m_IsInFreeze)
 		return true;
 
 	if (GameClient()->m_Snap.m_aCharacters[TargetId].m_Active)
