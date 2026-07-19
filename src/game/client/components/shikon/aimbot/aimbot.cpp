@@ -175,7 +175,10 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 		if(IsOneSpec || IsOneSolo)
 			continue;
 
-		if(!GameClient()->m_Teams.SameTeam(i, LocalId) || OwnClientData.m_HookHitDisabled)
+		if(Weapon == EWeapon::Hook && OwnClientData.m_HookHitDisabled)
+			continue;
+
+		if(!GameClient()->m_Teams.SameTeam(i, LocalId))
 			continue;
 
 		if(!InFov(Fov, Position - MyPos))
