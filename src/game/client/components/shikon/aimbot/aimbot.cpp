@@ -262,10 +262,14 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 
 bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir, int TargetId)
 {
-	if (TargetId != -1 && PlayerInWay(InitPos, TargetPos, TargetId))
-		return false;
 	float WSpeed = GetWeaponSpeed(Weapon);
 	float WReach = GetWeaponReach(Weapon);
+
+	if (Weapon == EWeapon::Hammer) {
+		return distance(InitPos, TargetPos) <= WReach;
+	}
+	if (TargetId != -1 && PlayerInWay(InitPos, TargetPos, TargetId))
+		return false;
 
 	vec2 ExDirection = normalize(ScanDir);
 	ExDirection.x = round_to_int(ExDirection.x * 256.0f) / 256.0f;
