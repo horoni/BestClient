@@ -272,9 +272,9 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 	if (TargetId != -1 && PlayerInWay(InitPos, TargetPos, TargetId))
 		return false;
 
-	vec2 ExDirection = NormalizeAim(ScanDir);
-	if (length(ExDirection) < 0.1f) return false;
-	ExDirection = normalize(ExDirection);
+	vec2 Dir = normalize(ScanDir);
+	if (length(Dir) < 0.1f)
+		return false;
 
 	vec2 OldPos = InitPos;
 	vec2 NewPos = OldPos;
@@ -284,7 +284,7 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 	do
 	{
 		OldPos = NewPos;
-		NewPos = OldPos + ExDirection * WSpeed;
+		NewPos = OldPos + Dir * WSpeed;
 
 		if(distance(InitPos, NewPos) > WReach)
 		{
