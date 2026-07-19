@@ -181,20 +181,20 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 			continue;
 
 		bool IsSameTeam = GameClient()->m_Teams.SameTeam(i, LocalId);
-		if(IsFNG && IsSameTeam)
-			continue;
-		else if(!IsSameTeam)
+		if(!IsFNG && !IsSameTeam)
 			continue;
 
 		if(!InFov(Fov, Position - MyPos))
 			continue;
 
 		const bool IsFrozen = IsPlayerFrozen(i);
+		if (g_Config.m_ShDbg)
+			GameClient()->m_Helper.dbg_msg("bot", "bot: w:%d i:%d fr:%d fng:%d", Weapon, i, IsFrozen, IsFNG);
 		// FNG: Skip if Tee is frozen and current weapon is Laser
 		if (Weapon == EWeapon::Laser) {
 			if(IsFNG && IsFrozen)
 				continue;
-			if ((GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace && !g_Config.m_ShAimForceFng) && !IsFrozen)
+			else if ((GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace && !IsFNG) && !IsFrozen)
 				continue;
 		}
 
