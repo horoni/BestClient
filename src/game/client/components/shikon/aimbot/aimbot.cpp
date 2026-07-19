@@ -198,7 +198,7 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 				continue;
 		}
 
-		if(ClosestID == -1 && distance(MyPos, Position) < Distance)
+		if(distance(MyPos, Position) < Distance)
 		{
 			ClosestID = i;
 			Distance = distance(MyPos, Position);
