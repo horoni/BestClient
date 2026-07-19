@@ -44,7 +44,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 	 *      targetPos
 	*/
 	const float VisibleAngle = atan2(PredTargetPos.y - MyPos.y, PredTargetPos.x - MyPos.x) + pi * 0.5f;
-	for(float i = VisibleAngle; i < pi + VisibleAngle; i += 1.f / g_Config.m_ShAimHookEdgeAccuracy)
+	for(float i = VisibleAngle; i < 2.f * pi + VisibleAngle; i += 1.f / g_Config.m_ShAimHookEdgeAccuracy)
 	{
 		// Return if we have enough hitpoints
 		if(HitPointsCount >= MAX_HITPOINTS)
