@@ -37,11 +37,13 @@ public:
 
 	// Helpers
 	bool PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel);
-	bool HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir);
+	bool HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir, int TargetId);
 	bool IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos);
+	bool IsPlayerFrozen(int TargetId);
+	bool PlayerInWay(vec2 InitPos, vec2 TargetPos, int TargetId);
 
 	// Scans
-    std::optional<vec2> EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, vec2 TargetPos, vec2 TargetVel);
+    std::optional<vec2> EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, vec2 TargetPos, vec2 TargetVel, int TargetId);
 
 	// Aim
 	vec2 NormalizeAim(vec2 Pos);

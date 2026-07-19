@@ -138,7 +138,7 @@ CSHAimbot::GetClosestTarget(EWeapon Weapon)
 	const vec2 TargetPos = GameClient()->m_aClients[TargetId].m_Predicted.m_Pos;
 	const vec2 TargetVel = GameClient()->m_aClients[TargetId].m_Predicted.m_Vel;
 
-	std::optional<vec2> AimDir = EdgeScan(Weapon, MyPos, MyVel, TargetPos, TargetVel);
+	std::optional<vec2> AimDir = EdgeScan(Weapon, MyPos, MyVel, TargetPos, TargetVel, TargetId);
 
 	if (!AimDir.has_value()) {
 		return std::nullopt;
@@ -152,7 +152,6 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 	const int LocalId = GetLocalId(GameClient());
 	const vec2 MyPos = GameClient()->m_aClients[LocalId].m_Active ?
 		GameClient()->m_aClients[LocalId].m_Predicted.m_Pos : vec2(0.f, 0.f);
-	const CTuningParams* pTuning = GameClient()->m_Helper.GetTuningAt(MyPos);
 	float Distance = Range;
 	int ClosestID = -1;
 
@@ -182,7 +181,7 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 		if(!InFov(Fov, Position - MyPos))
 			continue;
 
-		const bool IsFrozen = (GameClient()->m_aClients[i].m_Predicted.m_FreezeEnd > 0 || GameClient()->m_aClients[i].m_Predicted.m_IsInFreeze);
+		const bool IsFrozen = IsPlayerFrozen(i);
 		// FNG: Skip if Tee is frozen and current weapon is Laser
 		if (Weapon == EWeapon::Laser) {
 			if((GameClient()->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng) && IsFrozen)
@@ -252,8 +251,10 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 }
 
 
-bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir)
+bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir, int TargetId)
 {
+	if (TargetId != -1 && PlayerInWay(InitPos, TargetPos, TargetId))
+		return false;
 	float WSpeed = GetWeaponSpeed(Weapon);
 	float WReach = GetWeaponReach(Weapon);
 
@@ -308,6 +309,63 @@ bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 		{
 			NewPos = ClosestPoint;
 			return true;
+		}
+	}
+	return false;
+}
+
+bool CSHAimbot::IsPlayerFrozen(int TargetId)
+{
+	const auto& ClData = GameClient()->m_aClients[TargetId];
+
+	if (ClData.m_Predicted.m_FreezeEnd > 0 || ClData.m_Predicted.m_IsInFreeze)
+		return true;
+
+	if (GameClient()->m_Snap.m_aCharacters[TargetId].m_Active)
+	{
+		const auto& Cur = GameClient()->m_Snap.m_aCharacters[TargetId].m_Cur;
+		bool IsFNG = GameClient()->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng;
+		if (IsFNG)
+			if (Cur.m_Weapon == 5 || Cur.m_Armor > 0)
+				return true;
+	}
+
+	return false;
+}
+
+bool CSHAimbot::PlayerInWay(vec2 InitPos, vec2 TargetPos, int TargetId)
+{
+	const int LocalId = GetLocalId(GameClient());
+
+	auto *Player = dynamic_cast<CCharacter *>(GameClient()->m_GameWorld.FindFirst(GameClient()->m_GameWorld.ENTTYPE_CHARACTER));
+	for(; Player; Player = dynamic_cast<CCharacter *>(Player->TypeNext()))
+	{
+		int i = Player->GetId();
+		if(i == LocalId || i == TargetId || !Player)
+			continue;
+
+		const CGameClient::CClientData ClData = GameClient()->m_aClients[i];
+
+		if(!ClData.m_Active || ClData.m_Team == TEAM_SPECTATORS)
+			continue;
+
+		vec2 PlayerPos = ClData.m_Predicted.m_Pos;
+
+		vec2 ClosestPoint;
+		if(closest_point_on_line(InitPos, TargetPos, PlayerPos, ClosestPoint))
+		{
+			const float CollisionRadius = GetPhysSize() / 2.f;
+
+			if(distance(PlayerPos, ClosestPoint) < CollisionRadius + 1.f)
+			{
+				float DistToPlayer = distance(InitPos, PlayerPos);
+				float DistToTarget = distance(InitPos, TargetPos);
+
+				if (DistToPlayer < DistToTarget)
+				{
+					return true;
+				}
+			}
 		}
 	}
 	return false;

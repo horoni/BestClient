@@ -60,7 +60,7 @@ std::optional<CSHBalanceBot::CTargetInfo> CSHBalanceBot::FindTarget(const vec2& 
 		if (!IsValidVerticalPosition(PlayerPos, LocalPos))
 			continue;
 
-		if(!GameClient()->m_Aimbot.HitScanWeapon(EWeapon::Hook, LocalPos, PlayerPos, PlayerPos - LocalPos))
+		if(!GameClient()->m_Aimbot.HitScanWeapon(EWeapon::Hook, LocalPos, PlayerPos, PlayerPos - LocalPos, i))
 			continue;
 
 		const float Dist = distance(PlayerPos, LocalPos);

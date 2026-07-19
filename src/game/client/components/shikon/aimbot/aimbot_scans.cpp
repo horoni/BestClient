@@ -6,7 +6,7 @@
 
 #define MAX_HITPOINTS 32
 
-std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, vec2 TargetPos, vec2 TargetVel)
+std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, vec2 TargetPos, vec2 TargetVel, int TargetId)
 {
 	int HitPointsCount = 0;
 	vec2 HitPoints[MAX_HITPOINTS];
@@ -16,7 +16,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 		return std::nullopt;
 
 	// If player is hookable right away, return the position
-	if(HitScanWeapon(Weapon, MyPos, TargetPos, TargetPos - MyPos))
+	if(HitScanWeapon(Weapon, MyPos, TargetPos, TargetPos - MyPos, TargetId))
 	{
 		return TargetPos - MyPos;
 	}
@@ -50,7 +50,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 
 		// Check if hitpoint is hookable and if it is
 		// append it to `hitPoints` and increase `hitPointsCount`
-		if(HitScanWeapon(Weapon, MyPos, TargetPos, Dir))
+		if(HitScanWeapon(Weapon, MyPos, TargetPos, Dir, TargetId))
 		{
 			HitPoints[HitPointsCount] = Dir;
 			HitPointsCount++;
