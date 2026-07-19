@@ -271,12 +271,10 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 	if (TargetId != -1 && PlayerInWay(InitPos, TargetPos, TargetId))
 		return false;
 
-	vec2 ExDirection = normalize(ScanDir);
-	ExDirection.x = round_to_int(ExDirection.x * 256.0f) / 256.0f;
-	ExDirection.y = round_to_int(ExDirection.y * 256.0f) / 256.0f;
+	vec2 ExDirection = NormalizeAim(ScanDir);
+	if (length(ExDirection) < 0.1f) return false;
 	ExDirection = normalize(ExDirection);
 
-	vec2 FinishPos = InitPos + ExDirection * WReach;
 	vec2 OldPos = InitPos + ExDirection * GetPhysSize();
 	vec2 NewPos = OldPos;
 
@@ -294,18 +292,28 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 		}
 
 		int TeleNr = 0;
-		const int Hit = Weapon == EWeapon::Hook ?
-			Collision()->IntersectLineTeleHook(OldPos, NewPos, &FinishPos, nullptr, &TeleNr)
-			: Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &FinishPos, nullptr, &TeleNr);
+		int Hit = 0;
+		vec2 HitPos;
+		vec2 CharHitPos = NewPos;
+		if (Weapon == EWeapon::Laser) {
+			vec2 Perpendicular = vec2(-ExDirection.y, ExDirection.x);
+			if (Collision()->IntersectLineTeleWeapon(OldPos + Perpendicular, NewPos + Perpendicular, &HitPos, nullptr, &TeleNr) ||
+				Collision()->IntersectLineTeleWeapon(OldPos - Perpendicular, NewPos - Perpendicular, &HitPos, nullptr, &TeleNr) ||
+			    Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &HitPos, nullptr, &TeleNr)) {
+				Hit = 1;
+			}
+		} else if (Weapon == EWeapon::Hook){
+			Hit = Collision()->IntersectLineTeleHook(OldPos, NewPos, &HitPos, nullptr, &TeleNr);
+		} else {
+			Hit = Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &HitPos, nullptr, &TeleNr);
+		}
 
-		if(IntersectCharacter(OldPos, TargetPos, FinishPos))
-			return true;
+		if(IntersectCharacter(OldPos, TargetPos, CharHitPos))
+			if (!Hit || distance(OldPos, CharHitPos) <= distance(OldPos, HitPos))
+				return true;
 
 		if(Hit)
 			break;
-
-		NewPos.x = round_to_int(NewPos.x);
-		NewPos.y = round_to_int(NewPos.y);
 
 		if(OldPos == NewPos)
 			break;
@@ -318,7 +326,7 @@ bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
 	vec2 ClosestPoint;
 	if(closest_point_on_line(HookPos, NewPos, TargetPos, ClosestPoint))
 	{
-		if(distance(TargetPos, ClosestPoint) < GetPhysSize())
+		if(distance(TargetPos, ClosestPoint) <= GetPhysSize())
 		{
 			NewPos = ClosestPoint;
 			return true;
