@@ -226,9 +226,9 @@ float CSHAimbot::GetExtrapolationPing() const
 bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel)
 {
 	float WSpeed = GetWeaponSpeed(Weapon);
+	TargetPos += TargetVel * GetExtrapolationPing();
 
 	if (WSpeed >= INSTANT_SPEED) {
-		TargetPos += TargetVel * GetExtrapolationPing();
 		return true;
 	}
 
@@ -251,7 +251,7 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 		else if (t2 > 0.f) Time = t2;
 
 		if (Time > 0.f) {
-			TargetPos += TargetVel * (Time + GetExtrapolationPing());
+			TargetPos += TargetVel * Time;
 			return true;
 		}
 	}
