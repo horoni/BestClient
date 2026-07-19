@@ -275,7 +275,7 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 	if (length(ExDirection) < 0.1f) return false;
 	ExDirection = normalize(ExDirection);
 
-	vec2 OldPos = InitPos + ExDirection * GetPhysSize();
+	vec2 OldPos = InitPos;
 	vec2 NewPos = OldPos;
 
 	bool DoBreak = false;
@@ -308,9 +308,12 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 			Hit = Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &HitPos, nullptr, &TeleNr);
 		}
 
+		if(Hit) {
+			CharHitPos = HitPos;
+		}
+
 		if(IntersectCharacter(OldPos, TargetPos, CharHitPos))
-			if (!Hit || distance(OldPos, CharHitPos) <= distance(OldPos, HitPos))
-				return true;
+			return true;
 
 		if(Hit)
 			break;
