@@ -210,7 +210,8 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 float CSHAimbot::GetPing() const
 {
 	const auto RealPing = static_cast<float>(Client()->GetPredictionTime());
-	const float Ping = RealPing / 1000.f;
+	const auto TickSpeed = static_cast<float>(Client()->GameTickSpeed());
+	const float Ping = RealPing / 1000.f * TickSpeed;
 	return Ping;
 }
 
