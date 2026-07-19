@@ -163,7 +163,7 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 	for(; Player; Player = dynamic_cast<CCharacter *>(Player->TypeNext()))
 	{
 		int i = Player->GetId();
-		if(i == LocalId || !Player)
+		if(i == LocalId)
 			continue;
 
 		const CGameClient::CClientData ClData = GameClient()->m_aClients[i];
