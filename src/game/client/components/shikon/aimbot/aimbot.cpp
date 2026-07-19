@@ -295,14 +295,7 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 		int Hit = 0;
 		vec2 HitPos;
 		vec2 CharHitPos = NewPos;
-		if (Weapon == EWeapon::Laser) {
-			vec2 Perpendicular = vec2(-ExDirection.y, ExDirection.x);
-			if (Collision()->IntersectLineTeleWeapon(OldPos + Perpendicular, NewPos + Perpendicular, &HitPos, nullptr, &TeleNr) ||
-				Collision()->IntersectLineTeleWeapon(OldPos - Perpendicular, NewPos - Perpendicular, &HitPos, nullptr, &TeleNr) ||
-			    Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &HitPos, nullptr, &TeleNr)) {
-				Hit = 1;
-			}
-		} else if (Weapon == EWeapon::Hook){
+		if (Weapon == EWeapon::Hook) {
 			Hit = Collision()->IntersectLineTeleHook(OldPos, NewPos, &HitPos, nullptr, &TeleNr);
 		} else {
 			Hit = Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &HitPos, nullptr, &TeleNr);
