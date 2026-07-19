@@ -25,7 +25,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 	// If player is hookable right away, return the position
 	if(HitScanWeapon(Weapon, MyPos, PredTargetPos, PredTargetPos - MyPos, TargetId))
 	{
-		return TargetPos - MyPos;
+		return PredTargetPos - MyPos;
 	}
 
 	// If hitpoint scan is disabled and normal scan failed, return
