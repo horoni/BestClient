@@ -282,7 +282,7 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 			Collision()->IntersectLineTeleHook(OldPos, NewPos, &FinishPos, nullptr, &TeleNr)
 			: Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &FinishPos, nullptr, &TeleNr);
 
-		if(IntersectCharacter(OldPos, TargetPos, FinishPos))
+		if(IntersectCharacter(OldPos, TargetPos, NewPos))
 			return true;
 
 		if(Hit)
