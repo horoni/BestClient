@@ -252,6 +252,7 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 
 		if (Time > 0.f) {
 			TargetPos += TargetVel * Time;
+			MyPos += MyVel * Time;
 			return true;
 		}
 	}

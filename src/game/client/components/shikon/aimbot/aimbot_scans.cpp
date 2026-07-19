@@ -11,12 +11,19 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 	int HitPointsCount = 0;
 	vec2 HitPoints[MAX_HITPOINTS];
 
+	vec2 PredTargetPos = TargetPos;
+	vec2 PredMyPos = MyPos;
+
 	// Predict hook and return, if it's impossible
-	if(!PredictWeapon(Weapon, MyPos, MyVel, TargetPos, TargetVel))
+	if(!PredictWeapon(Weapon, PredMyPos, MyVel, PredTargetPos, TargetVel))
+		return std::nullopt;
+
+	// If distance between me and player greater than hook length, we cant hook him, return
+	if (Weapon == EWeapon::Hook && distance(PredMyPos, PredTargetPos) > GetWeaponReach(Weapon))
 		return std::nullopt;
 
 	// If player is hookable right away, return the position
-	if(HitScanWeapon(Weapon, MyPos, TargetPos, TargetPos - MyPos, TargetId))
+	if(HitScanWeapon(Weapon, MyPos, PredTargetPos, PredTargetPos - MyPos, TargetId))
 	{
 		return TargetPos - MyPos;
 	}
@@ -36,7 +43,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 	 * |__a\
 	 *      targetPos
 	*/
-	const float VisibleAngle = atan2(TargetPos.y - MyPos.y, TargetPos.x - MyPos.x) + pi * 0.5f;
+	const float VisibleAngle = atan2(PredTargetPos.y - MyPos.y, PredTargetPos.x - MyPos.x) + pi * 0.5f;
 	for(float i = VisibleAngle; i < pi + VisibleAngle; i += 1.f / g_Config.m_ShAimHookEdgeAccuracy)
 	{
 		// Return if we have enough hitpoints
@@ -44,13 +51,13 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 			break;
 
 		// Convert desired angle(hitpoint) to Cartesian coordinates
-		auto Pos = vec2(static_cast<int>(TargetPos.x + cosf(i) * GetPhysSize()),
-			static_cast<int>(TargetPos.y + sinf(i) * GetPhysSize()));
+		auto Pos = vec2(static_cast<int>(PredTargetPos.x + cosf(i) * GetPhysSize()),
+			static_cast<int>(PredTargetPos.y + sinf(i) * GetPhysSize()));
 		const vec2 Dir = Pos - MyPos;
 
 		// Check if hitpoint is hookable and if it is
 		// append it to `hitPoints` and increase `hitPointsCount`
-		if(HitScanWeapon(Weapon, MyPos, TargetPos, Dir, TargetId))
+		if(HitScanWeapon(Weapon, MyPos, PredTargetPos, Dir, TargetId))
 		{
 			HitPoints[HitPointsCount] = Dir;
 			HitPointsCount++;
