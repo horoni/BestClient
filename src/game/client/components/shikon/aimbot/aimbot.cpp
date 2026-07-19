@@ -155,6 +155,8 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 	float Distance = Range;
 	int ClosestID = -1;
 
+	bool IsFNG = GameClient()->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng;
+
 	const CGameClient::CClientData OwnClientData = GameClient()->m_aClients[LocalId];
 
 	auto *Player = dynamic_cast<CCharacter *>(GameClient()->m_GameWorld.FindFirst(GameClient()->m_GameWorld.ENTTYPE_CHARACTER));
@@ -178,7 +180,10 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 		if(Weapon == EWeapon::Hook && OwnClientData.m_HookHitDisabled)
 			continue;
 
-		if(!GameClient()->m_Teams.SameTeam(i, LocalId))
+		bool IsSameTeam = GameClient()->m_Teams.SameTeam(i, LocalId);
+		if(IsFNG && IsSameTeam)
+			continue;
+		else if(!IsSameTeam)
 			continue;
 
 		if(!InFov(Fov, Position - MyPos))
@@ -187,7 +192,7 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 		const bool IsFrozen = IsPlayerFrozen(i);
 		// FNG: Skip if Tee is frozen and current weapon is Laser
 		if (Weapon == EWeapon::Laser) {
-			if((GameClient()->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng) && IsFrozen)
+			if(IsFNG && IsFrozen)
 				continue;
 			if ((GameClient()->m_GameWorld.m_WorldConfig.m_IsDDRace && !g_Config.m_ShAimForceFng) && !IsFrozen)
 				continue;
