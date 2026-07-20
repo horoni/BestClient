@@ -41,7 +41,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 	 * |__a\
 	 *      targetPos
 	*/
-	const float Radius = (Weapon == EWeapon::Hook) ? GetPhysSize() + 2.0f : GetPhysSize();
+	const float Radius = (Weapon == EWeapon::Hook) ? GetPhysSize() + 2.0f : GetPhysSize() * 0.5f;
 	const float VisibleAngle = atan2(PredTargetPos.y - MyPos.y, PredTargetPos.x - MyPos.x) + pi * 0.5f;
 	for(float i = VisibleAngle; i < 2.f * pi + VisibleAngle; i += 1.f / g_Config.m_ShAimHookEdgeAccuracy)
 	{
