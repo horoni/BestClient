@@ -265,9 +265,8 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 {
 	float WReach = GetWeaponReach(Weapon);
 
-	if (Weapon == EWeapon::Hammer) {
+	if (Weapon == EWeapon::Hammer)
 		return distance(InitPos, TargetPos) <= WReach;
-	}
 	if (TargetId != -1 && PlayerInWay(InitPos, TargetPos, TargetId))
 		return false;
 
