@@ -64,14 +64,13 @@ void CSHAimbot::Aimbot()
 
 bool CSHAimbot::AutoLaser()
 {
-	static bool s_Fired = false;
 	const int LocalDataId = GetLocalData();
 
-	if (s_Fired)
+	if (m_LaserFired)
 	{
 		GameClient()->m_Controls.m_aLastData[LocalDataId].m_Fire = 0;
 		GameClient()->m_Controls.m_aInputData[LocalDataId].m_Fire = 0;
-		s_Fired = false;
+		m_LaserFired = false;
 		return false;
 	}
 
@@ -84,8 +83,8 @@ bool CSHAimbot::AutoLaser()
 
 	Aim(NormalizeAim(Target->m_AimDir));
 	GameClient()->m_Controls.m_aInputData[LocalDataId].m_Fire = 1;
-	s_Fired = true;
 
+	m_LaserFired = true;
 	return true;
 }
 
@@ -452,4 +451,9 @@ float CSHAimbot::GetWeaponSpeed(EWeapon Weapon)
 		case EWeapon::Grenade: return pTuning->m_GrenadeSpeed;
 		case EWeapon::Laser: return INSTANT_SPEED;
 	}
+}
+
+void CSHAimbot::OnReset() {
+    m_CanAim = true;
+	m_LaserFired = false;
 }

@@ -17,6 +17,7 @@ class CSHAimbot : public CComponent
 {
 public:
 	int Sizeof() const override { return sizeof(*this); }
+	void OnReset() override;
 
     struct CAimTargetInfo {
         int m_Id;
@@ -54,4 +55,5 @@ public:
 
 	// Globals
 	bool m_CanAim = true;
+	bool m_LaserFired = false;
 };
