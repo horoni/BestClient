@@ -269,14 +269,15 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 
 	if (Weapon == EWeapon::Hammer)
 		return distance(InitPos, TargetPos) <= WReach;
-	if (TargetId != -1 && PlayerInWay(InitPos, TargetPos, TargetId))
-		return false;
 
 	vec2 Dir = normalize(ScanDir);
 	if (length(Dir) < 0.1f)
 		return false;
 
 	vec2 EndPos = InitPos + Dir * WReach;
+	if (TargetId != -1 && PlayerInWay(InitPos, EndPos, TargetId))
+		return false;
+
 	vec2 HitPos;
 	int TeleNr = 0;
 	int Hit = 0;
