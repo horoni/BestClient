@@ -156,6 +156,8 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 	int ClosestID = -1;
 
 	bool IsFNG = GameClient()->m_GameWorld.m_WorldConfig.m_IsFNG || g_Config.m_ShAimForceFng;
+	bool IsTeamFNG = IsFNG && GameClient()->m_Snap.m_pGameInfoObj &&
+                 (GameClient()->m_Snap.m_pGameInfoObj->m_GameFlags & GAMEFLAG_TEAMS);
 
 	const CGameClient::CClientData OwnClientData = GameClient()->m_aClients[LocalId];
 
@@ -180,8 +182,9 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 		if(Weapon == EWeapon::Hook && OwnClientData.m_HookHitDisabled)
 			continue;
 
-		bool IsSameTeam = GameClient()->m_Teams.SameTeam(i, LocalId);
-		if(!IsFNG && !IsSameTeam)
+		if(IsTeamFNG && ClData.m_Team == OwnClientData.m_Team)
+			continue;
+		if(!IsFNG && !GameClient()->m_Teams.SameTeam(i, LocalId))
 			continue;
 
 		if(!InFov(Fov, Position - MyPos))
@@ -189,7 +192,7 @@ int CSHAimbot::GetClosestId(EWeapon Weapon, int Fov, float Range)
 
 		const bool IsFrozen = IsPlayerFrozen(i);
 		if (g_Config.m_ShDbg)
-			GameClient()->m_Helper.dbg_msg("bot", "bot: w:%d i:%d fr:%d fng:%d", Weapon, i, IsFrozen, IsFNG);
+			GameClient()->m_Helper.dbg_msg("bot", "bot: w:%d i:%d fr:%d fng:%d fngt:%d", Weapon, i, IsFrozen, IsFNG, IsTeamFNG);
 		// FNG: Skip if Tee is frozen and current weapon is Laser
 		if (Weapon == EWeapon::Laser) {
 			if(IsFNG && IsFrozen)
