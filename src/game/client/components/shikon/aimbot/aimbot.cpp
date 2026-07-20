@@ -287,16 +287,19 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 		Hit = Collision()->IntersectLineTeleWeapon(InitPos, EndPos, &HitPos, nullptr, &TeleNr);
 	}
 
+	const float CharRadius = (Weapon == EWeapon::Hook)
+        ? GetPhysSize() + 2.0f
+        : GetPhysSize();
 	vec2 CharHitPos = Hit ? HitPos : EndPos;
-	return IntersectCharacter(InitPos, TargetPos, CharHitPos);
+	return IntersectCharacter(InitPos, TargetPos, CharHitPos, CharRadius);
 }
 
-bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
+bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos, float Radius)
 {
 	vec2 ClosestPoint;
 	if(closest_point_on_line(HookPos, NewPos, TargetPos, ClosestPoint))
 	{
-		if(distance(TargetPos, ClosestPoint) <= GetPhysSize())
+		if(distance(TargetPos, ClosestPoint) <= Radius)
 		{
 			NewPos = ClosestPoint;
 			return true;

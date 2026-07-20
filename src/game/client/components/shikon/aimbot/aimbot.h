@@ -39,7 +39,7 @@ public:
 	// Helpers
 	bool PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &TargetPos, vec2 TargetVel);
 	bool HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir, int TargetId);
-	bool IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos);
+	bool IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos, float Radius);
 	bool IsPlayerFrozen(int TargetId);
 	bool PlayerInWay(vec2 InitPos, vec2 TargetPos, int TargetId);
 
