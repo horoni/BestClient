@@ -345,9 +345,7 @@ bool CSHAimbot::PlayerInWay(vec2 InitPos, vec2 TargetPos, int TargetId)
 		vec2 ClosestPoint;
 		if(closest_point_on_line(InitPos, TargetPos, PlayerPos, ClosestPoint))
 		{
-			const float CollisionRadius = GetPhysSize() / 2.f;
-
-			if(distance(PlayerPos, ClosestPoint) < CollisionRadius + 1.f)
+			if(distance(PlayerPos, ClosestPoint) < GetPhysSize() + 1.f)
 			{
 				float DistToPlayer = distance(InitPos, PlayerPos);
 				float DistToTarget = distance(InitPos, TargetPos);
