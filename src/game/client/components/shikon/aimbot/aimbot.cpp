@@ -263,7 +263,6 @@ bool CSHAimbot::PredictWeapon(EWeapon Weapon, vec2 &MyPos, vec2 MyVel, vec2 &Tar
 
 bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2 ScanDir, int TargetId)
 {
-	float WSpeed = GetWeaponSpeed(Weapon);
 	float WReach = GetWeaponReach(Weapon);
 
 	if (Weapon == EWeapon::Hammer) {
@@ -276,46 +275,19 @@ bool CSHAimbot::HitScanWeapon(EWeapon Weapon, vec2 InitPos, vec2 TargetPos, vec2
 	if (length(Dir) < 0.1f)
 		return false;
 
-	vec2 OldPos = InitPos;
-	vec2 NewPos = OldPos;
+	vec2 EndPos = InitPos + Dir * WReach;
+	vec2 HitPos;
+	int TeleNr = 0;
+	int Hit = 0;
 
-	bool DoBreak = false;
+	if (Weapon == EWeapon::Hook) {
+		Hit = Collision()->IntersectLineTeleHook(InitPos, EndPos, &HitPos, nullptr, &TeleNr);
+	} else {
+		Hit = Collision()->IntersectLineTeleWeapon(InitPos, EndPos, &HitPos, nullptr, &TeleNr);
+	}
 
-	do
-	{
-		OldPos = NewPos;
-		NewPos = OldPos + Dir * WSpeed;
-
-		if(distance(InitPos, NewPos) > WReach)
-		{
-			NewPos = InitPos + normalize(NewPos - InitPos) * WReach;
-			DoBreak = true;
-		}
-
-		int TeleNr = 0;
-		int Hit = 0;
-		vec2 HitPos;
-		vec2 CharHitPos = NewPos;
-		if (Weapon == EWeapon::Hook) {
-			Hit = Collision()->IntersectLineTeleHook(OldPos, NewPos, &HitPos, nullptr, &TeleNr);
-		} else {
-			Hit = Collision()->IntersectLineTeleWeapon(OldPos, NewPos, &HitPos, nullptr, &TeleNr);
-		}
-
-		if(Hit) {
-			CharHitPos = HitPos;
-		}
-
-		if(IntersectCharacter(OldPos, TargetPos, CharHitPos))
-			return true;
-
-		if(Hit)
-			break;
-
-		if(OldPos == NewPos)
-			break;
-	} while(!DoBreak);
-	return false;
+	vec2 CharHitPos = Hit ? HitPos : EndPos;
+	return IntersectCharacter(InitPos, TargetPos, CharHitPos);
 }
 
 bool CSHAimbot::IntersectCharacter(vec2 HookPos, vec2 TargetPos, vec2 &NewPos)
