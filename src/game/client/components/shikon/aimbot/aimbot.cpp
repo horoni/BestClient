@@ -410,7 +410,6 @@ bool CSHAimbot::InFov(float Fov, vec2 Dir)
 	float Diff = std::abs(MouseAngle - DirAngle);
 
 	while(Diff > pi) Diff -= 2.f * pi;
-	while(Diff < -pi) Diff += 2.f * pi;
 	Diff = std::abs(Diff);
 
 	float DiffDeg = Diff * 180.f / pi;
