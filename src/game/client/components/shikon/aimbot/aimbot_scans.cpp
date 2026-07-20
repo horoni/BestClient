@@ -41,6 +41,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 	 * |__a\
 	 *      targetPos
 	*/
+	const float Radius = (Weapon == EWeapon::Hook) ? GetPhysSize() + 2.0f : GetPhysSize();
 	const float VisibleAngle = atan2(PredTargetPos.y - MyPos.y, PredTargetPos.x - MyPos.x) + pi * 0.5f;
 	for(float i = VisibleAngle; i < 2.f * pi + VisibleAngle; i += 1.f / g_Config.m_ShAimHookEdgeAccuracy)
 	{
@@ -49,8 +50,8 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 			break;
 
 		// Convert desired angle(hitpoint) to Cartesian coordinates
-		auto Pos = vec2(static_cast<int>(PredTargetPos.x + cosf(i) * GetPhysSize()),
-			static_cast<int>(PredTargetPos.y + sinf(i) * GetPhysSize()));
+		auto Pos = vec2(static_cast<int>(PredTargetPos.x + cosf(i) * Radius),
+						static_cast<int>(PredTargetPos.y + sinf(i) * Radius));
 		const vec2 Dir = Pos - MyPos;
 
 		// Check if hitpoint is hookable and if it is
