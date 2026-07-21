@@ -3261,6 +3261,10 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	} else
 		Column.HSplitTop(LineSize * 2, nullptr, &Column);
 
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHookEdge, ("Edge Scan"), &g_Config.m_ShAimHookEdge, &Column, LineSize);
+	Column.HSplitTop(LineSize, &Button, &Column);
+	Ui()->DoScrollbarOption(&g_Config.m_ShAimHookEdgeAccuracy, &g_Config.m_ShAimHookEdgeAccuracy, &Button, ("Accuracy"), 1, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
+
 	if (g_Config.m_ShAim)
 	{
 		static int s_SelectedWeapon = 0;
@@ -3282,9 +3286,6 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHook, ("Aimbot"), &g_Config.m_ShAimHook, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
 			Ui()->DoScrollbarOption(&g_Config.m_ShAimHookFov, &g_Config.m_ShAimHookFov, &Button, ("FOV"), 0, 360, &CUi::ms_LinearScrollbarScale, 0u, "°");
-			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHookEdge, ("Hook Edge Scan"), &g_Config.m_ShAimHookEdge, &Column, LineSize);
-			Column.HSplitTop(LineSize, &Button, &Column);
-			Ui()->DoScrollbarOption(&g_Config.m_ShAimHookEdgeAccuracy, &g_Config.m_ShAimHookEdgeAccuracy, &Button, ("Accuracy"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
 		} else if (s_SelectedWeapon == 1) { // Hammer
 			DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHammer, ("Aimbot"), &g_Config.m_ShAimHammer, &Column, LineSize);
 			Column.HSplitTop(LineSize, &Button, &Column);
@@ -3319,7 +3320,7 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	Ui()->DoLabel(&Label, "Other", HeadlineFontSize, TEXTALIGN_ML);
 	Column.HSplitTop(MarginSmall, nullptr, &Column);
 
-  DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShBalance, ("BalanceBot"), &g_Config.m_ShBalance, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShBalance, ("BalanceBot"), &g_Config.m_ShBalance, &Column, LineSize);
 
 	const char *apBalanceVMode[] = {"Below", "Above", "Both"};
 	static CUi::SDropDownState s_BalanceVModeDropDownState;
@@ -3333,10 +3334,10 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEsp, ("ESP"), &g_Config.m_ShEsp, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspHookFov, ("Draw Hook FOV"), &g_Config.m_ShEspHookFov, &Column, LineSize);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspWeaponFov, ("Draw Weapon FOV"), &g_Config.m_ShEspWeaponFov, &Column, LineSize);
-  DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspPredict, ("Draw predict"), &g_Config.m_ShEspPredict, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspPredict, ("Draw predict"), &g_Config.m_ShEspPredict, &Column, LineSize);
 	Column.HSplitTop(LineSize, &Button, &Column);
 	Ui()->DoScrollbarOption(&g_Config.m_ShEspPredictTicks, &g_Config.m_ShEspPredictTicks, &Button, ("Ticks"), 1, 32);
-  DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspPredictEven, ("Draw even ticks (predict)"), &g_Config.m_ShEspPredictEven, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShEspPredictEven, ("Draw even ticks (predict)"), &g_Config.m_ShEspPredictEven, &Column, LineSize);
 
 	static CButtonContainer s_HookFovColorId, s_WeaponFovColorId;
 	DoLine_ColorPicker(&s_HookFovColorId, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &Column, Localize("Hook FOV Color"), &g_Config.m_ShEspHookFovCol, ColorRGBA(0.0f, 0.0f, 0.0f), false);
