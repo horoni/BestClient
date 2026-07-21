@@ -90,6 +90,7 @@
 #include "components/bestclient/3d_particles.h"
 #include "components/bestclient/admin_panel.h"
 #include "components/bestclient/cherry_gifs.h"
+#include "components/bestclient/chat_bubbles.h"
 #include "components/bestclient/fast_actions.h"
 #include "components/bestclient/fast_practice.h"
 #include "components/bestclient/gif_bubbles.h"
@@ -103,6 +104,7 @@
 #include "components/bestclient/self_time_cp.h"
 #include "components/bestclient/translate.h"
 #include "components/bestclient/voice/voice.h"
+#include "components/bestclient/clans/clans.h"
 #include "components/tclient/warlist.h"
 #include "components/tooltips.h"
 #include "components/touch_controls.h"
@@ -252,6 +254,7 @@ public:
 	CCherryGifs m_CherryGifs; // BestClient
 	CGifWheel m_GifWheel; // BestClient
 	CGifBubbles m_GifBubbles; // BestClient
+	CChatBubbles m_ChatBubbles; // BestClient
 	CFastPractice m_FastPractice; // BestClient
 	CBgDraw m_BgDraw;
 	CTClient m_TClient;
@@ -267,6 +270,7 @@ public:
 	CMusicPlayer m_MusicPlayer; // BestClient
 	CAdminPanel m_AdminPanel; // BestClient
 	CVoiceChat m_VoiceChat; // BestClient
+	CClans m_Clans; // BestClient
 	CHudEditor m_HudEditor; // BestClient
 	CPet m_Pet;
 	CPlayerIndicator m_PlayerIndicator;

@@ -14,6 +14,7 @@
 #include <engine/keys.h>
 #include <engine/shared/config.h>
 
+#include <game/client/components/bestclient/gradient.h>
 #include <game/localization.h>
 
 #include <limits>
@@ -52,6 +53,7 @@ void CUIElement::SUIElementRect::Reset()
 	m_TextOutlineColor = ColorRGBA(-1, -1, -1, -1);
 	m_QuadColor = ColorRGBA(-1, -1, -1, -1);
 	m_ReadCursorGlyphCount = -1;
+	m_GradientPhaseBucket = -1;
 }
 
 void CUIElement::SUIElementRect::Draw(const CUIRect *pRect, ColorRGBA Color, int Corners, float Rounding)
@@ -877,11 +879,20 @@ void CUi::DoLabelStreamed(CUIElement::SUIElementRect &RectEl, const CUIRect *pRe
 	const int ReadCursorGlyphCount = pReadCursor == nullptr ? -1 : pReadCursor->m_GlyphCount;
 	bool NeedsRecreate = false;
 	bool ColorChanged = RectEl.m_TextColor != TextRender()->GetTextColor() || RectEl.m_TextOutlineColor != TextRender()->GetTextOutlineColor();
+	int GradientPhaseBucket = -1;
+	if(g_Config.m_BcNameplateGradientEverything)
+	{
+		// Rebuild when the animated gradient phase advances so server browser
+		// (and other streamed labels) keep shimmering instead of freezing.
+		GradientPhaseBucket = (int)(CBcGradient::AnimatePhase(Client()->GlobalTime()) * 64.0f) % 64;
+		if(RectEl.m_GradientPhaseBucket != GradientPhaseBucket)
+			NeedsRecreate = true;
+	}
 	if((!RectEl.m_UITextContainer.Valid() && pText[0] != '\0' && StrLen != 0) || RectEl.m_Width != pRect->w || RectEl.m_Height != pRect->h || ColorChanged || RectEl.m_ReadCursorGlyphCount != ReadCursorGlyphCount)
 	{
 		NeedsRecreate = true;
 	}
-	else
+	else if(!NeedsRecreate)
 	{
 		if(StrLen <= -1)
 		{
@@ -896,6 +907,7 @@ void CUi::DoLabelStreamed(CUIElement::SUIElementRect &RectEl, const CUIRect *pRe
 	}
 	RectEl.m_X = pRect->x;
 	RectEl.m_Y = pRect->y;
+	RectEl.m_GradientPhaseBucket = GradientPhaseBucket;
 	if(NeedsRecreate)
 	{
 		TextRender()->DeleteTextContainer(RectEl.m_UITextContainer);
@@ -936,12 +948,14 @@ CLabelResult CUi::DoLabel_AutoLineSize(const char *pText, float FontSize, int Al
 	return DoLabel(&LabelRect, pText, FontSize, Align);
 }
 
-bool CUi::DoEditBox(CLineInput *pLineInput, const CUIRect *pRect, float FontSize, int Corners, const std::vector<STextColorSplit> &vColorSplits)
+bool CUi::DoEditBox(CLineInput *pLineInput, const CUIRect *pRect, float FontSize, int Corners, const std::vector<STextColorSplit> &vColorSplits, float LineWidth, float LineSpacing, const IButtonColorFunction *pColorFunction, int Align)
 {
 	const bool Inside = MouseHovered(pRect);
 	const bool Active = m_pLastActiveItem == pLineInput;
 	const bool Changed = pLineInput->WasChanged();
 	const bool CursorChanged = pLineInput->WasCursorChanged();
+	const bool Multiline = LineWidth >= 0.0f;
+	const int EffectiveAlign = Align >= 0 ? Align : (Multiline ? TEXTALIGN_TL : TEXTALIGN_ML);
 
 	const float VSpacing = 2.0f;
 	CUIRect Textbox;
@@ -984,6 +998,11 @@ bool CUi::DoEditBox(CLineInput *pLineInput, const CUIRect *pRect, float FontSize
 
 	float ScrollOffset = pLineInput->GetScrollOffset();
 	float ScrollOffsetChange = pLineInput->GetScrollOffsetChange();
+	if(Multiline)
+	{
+		ScrollOffset = 0.0f;
+		ScrollOffsetChange = 0.0f;
+	}
 
 	// Update mouse selection information
 	CLineInput::SMouseSelection *pMouseSelection = pLineInput->GetMouseSelection();
@@ -1019,14 +1038,26 @@ bool CUi::DoEditBox(CLineInput *pLineInput, const CUIRect *pRect, float FontSize
 	}
 
 	// Render
-	pRect->Draw(ms_LightButtonColorFunction.GetColor(Active, HotItem() == pLineInput), Corners, 3.0f);
+	const IButtonColorFunction &ColorFn = pColorFunction ? *pColorFunction : ms_LightButtonColorFunction;
+	pRect->Draw(ColorFn.GetColor(Active, HotItem() == pLineInput), Corners, 3.0f);
 	ClipEnable(pRect);
 	Textbox.x -= ScrollOffset;
-	const STextBoundingBox BoundingBox = pLineInput->Render(&Textbox, FontSize, TEXTALIGN_ML, Changed || CursorChanged, -1.0f, 0.0f, vColorSplits);
+	if(Multiline)
+	{
+		// Keep wrapped text off the top edge of the field.
+		const float TopPad = 3.0f;
+		if(Textbox.h > TopPad + FontSize)
+		{
+			Textbox.y += TopPad;
+			Textbox.h -= TopPad;
+		}
+	}
+	const float EffectiveLineWidth = Multiline ? Textbox.w : LineWidth;
+	const STextBoundingBox BoundingBox = pLineInput->Render(&Textbox, FontSize, EffectiveAlign, Changed || CursorChanged, EffectiveLineWidth, LineSpacing, vColorSplits);
 	ClipDisable();
 
 	// Scroll left or right if necessary
-	if(Active && !JustGotActive && (Changed || CursorChanged || Input()->HasComposition()))
+	if(!Multiline && Active && !JustGotActive && (Changed || CursorChanged || Input()->HasComposition()))
 	{
 		const float CaretPositionX = pLineInput->GetCaretPosition().x - Textbox.x - ScrollOffset - ScrollOffsetChange;
 		if(CaretPositionX > Textbox.w)
@@ -1035,7 +1066,8 @@ bool CUi::DoEditBox(CLineInput *pLineInput, const CUIRect *pRect, float FontSize
 			ScrollOffsetChange += CaretPositionX;
 	}
 
-	DoSmoothScrollLogic(&ScrollOffset, &ScrollOffsetChange, Textbox.w, BoundingBox.m_W, true);
+	if(!Multiline)
+		DoSmoothScrollLogic(&ScrollOffset, &ScrollOffsetChange, Textbox.w, BoundingBox.m_W, true);
 
 	pLineInput->SetScrollOffset(ScrollOffset);
 	pLineInput->SetScrollOffsetChange(ScrollOffsetChange);

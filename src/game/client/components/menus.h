@@ -526,6 +526,16 @@ protected:
 #endif
 	void RenderMenubar(CUIRect Box, IClient::EClientState ClientState);
 	void RenderNews(CUIRect MainView);
+	void RenderClans(CUIRect MainView);
+	void RenderClansAuth(CUIRect MainView);
+	void RenderClansLanding(CUIRect MainView);
+	void RenderClansSetup(CUIRect MainView);
+	void RenderClansPage(CUIRect MainView);
+	void RenderClansPreview(CUIRect MainView);
+	void RenderClansApplications(CUIRect MainView);
+	void RenderClansAnnouncements(CUIRect MainView);
+	void RenderClansSettings(CUIRect MainView);
+	void RenderClansRecent(CUIRect MainView);
 	static void ConchainBackgroundEntities(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainUpdateMusicState(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	void UpdateMusicState();
@@ -740,6 +750,7 @@ public:
 		PAGE_SETTINGS,
 		PAGE_NETWORK,
 		PAGE_GHOST,
+		PAGE_CLANS,
 
 		PAGE_LENGTH,
 	};
@@ -937,6 +948,8 @@ private:
 public:
 	bool IsIngameGamePage() const { return m_MenuActive && Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_GAME; }
 	bool IsIngameSettingsPage() const { return m_MenuActive && Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_SETTINGS; }
+	int MenuPage() const { return m_MenuPage; }
+	int GamePage() const { return m_GamePage; }
 
 	// found in bestclient/menus_assets_editor.cpp
 	enum

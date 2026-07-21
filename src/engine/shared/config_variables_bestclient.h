@@ -11,6 +11,16 @@
 // SettingsTabs
 MACRO_CONFIG_INT(BcBestClientSettingsTabs, bc_bestclient_settings_tabs, 0, 0, 65536, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Bit flags to disable BestClient settings tabs")
 
+// Chat Filter
+MACRO_CONFIG_INT(BcShowBlockedWordInConsole, bc_show_blocked_word_in_console, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show blocked word with regex in console")
+MACRO_CONFIG_COL(BcBlockedWordConsoleColor, bc_blocked_word_console_color, 0x99ffff, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Color of blocked word messages in console")
+MACRO_CONFIG_INT(BcEnableCensorList, bc_enable_censor_list, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable chat filter")
+MACRO_CONFIG_INT(BcMultipleReplacementChar, bc_multiple_replacement_char, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Multiple replacement char on blocked word len")
+MACRO_CONFIG_STR(BcBlockedContentReplacementChar, bc_blocked_content_replacement_char, 64, "*", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Character used to replace blocked content")
+MACRO_CONFIG_STR(BcRegexPlayerWhitelist, bc_regex_player_whitelist, 512, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat filter player whitelist")
+MACRO_CONFIG_INT(BcFilterChangeWholeWord, bc_filter_change_whole_word, 1, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Change whole word to replacement character")
+MACRO_CONFIG_STR(BcBlockedContentPartialReplacementChar, bc_blocked_content_partial_replacement_char, 64, "*", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Character used to replace partial blocked content")
+
 // Auto update
 MACRO_CONFIG_INT(BcAutoUpdate, bc_auto_update, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Automatically download and apply updates on startup")
 
@@ -81,6 +91,21 @@ MACRO_CONFIG_INT(BcGifBubbleAboveHead, bc_gif_bubble_above_head, 1, 0, 1, CFGFLA
 MACRO_CONFIG_STR(BcGifBubbleDomains, bc_gif_bubble_domains, 256, "gifs.teeworlds.xyz", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Semicolon-separated domains that trigger the above-head gif bubble")
 MACRO_CONFIG_INT(BcGifBubbleDurationMs, bc_gif_bubble_duration_ms, 5000, 1000, 15000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "How long the above-head gif bubble stays visible")
 MACRO_CONFIG_INT(BcGifBubbleOffsetY, bc_gif_bubble_offset_y, 90, 0, 300, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Vertical offset of the above-head gif bubble")
+
+// Chat bubbles (above players)
+MACRO_CONFIG_INT(BcChatBubbles, bc_chat_bubbles, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show chat bubbles above players")
+MACRO_CONFIG_INT(BcChatBubblesSelf, bc_chat_bubbles_self, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show chat bubbles above yourself")
+MACRO_CONFIG_INT(BcChatBubblesDemo, bc_chat_bubbles_demo, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show chat bubbles in demo playback")
+MACRO_CONFIG_INT(BcChatBubbleSize, bc_chat_bubble_size, 20, 20, 30, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of chat bubbles")
+MACRO_CONFIG_INT(BcChatBubbleShowTime, bc_chat_bubble_showtime, 200, 200, 1000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "How long to show chat bubbles (centiseconds)")
+MACRO_CONFIG_INT(BcChatBubbleFadeOut, bc_chat_bubble_fadeout, 35, 15, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat bubble fade-out duration (centiseconds)")
+MACRO_CONFIG_INT(BcChatBubbleFadeIn, bc_chat_bubble_fadein, 15, 15, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat bubble fade-in duration (centiseconds)")
+MACRO_CONFIG_INT(BcChatBubbleAnimation, bc_chat_bubble_animation, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Animate chat bubble stacking movement")
+MACRO_CONFIG_INT(BcChatBubbleCustomColors, bc_chat_bubble_custom_colors, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use custom colors for chat bubbles")
+MACRO_CONFIG_COL(BcChatBubbleBgColor, bc_chat_bubble_bg_color, 0x40000000U, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Chat bubble background color")
+MACRO_CONFIG_COL(BcChatBubbleTextColor, bc_chat_bubble_text_color, 0xFFFFFFFFU, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Chat bubble text color")
+MACRO_CONFIG_COL(BcChatBubbleOutlineColor, bc_chat_bubble_outline_color, 0x80000000U, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Chat bubble text outline color")
+MACRO_CONFIG_INT(BcChatBubbleRounding, bc_chat_bubble_rounding, 0, 0, 30, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Chat bubble corner rounding (0 = auto from size)")
 
 // Animations
 MACRO_CONFIG_INT(BcAnimations, bc_animations, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Toggle BestClient UI animations")
@@ -353,3 +378,9 @@ MACRO_CONFIG_STR(BcClientIndicatorTokenUrl, bc_client_indicator_token_url, 256, 
 MACRO_CONFIG_STR(BcClientIndicatorSharedToken, bc_client_indicator_shared_token, 256, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Client indicator shared token for signed UDP packets")
 MACRO_CONFIG_STR(BcClientIndicatorSecretKey, bc_client_indicator_secret_key, 256, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Client indicator developer secret key")
 MACRO_CONFIG_INT(BrFilterBestclient, br_filter_bestclient, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Filter out servers with no BestClient users")
+
+// Clans
+MACRO_CONFIG_INT(BcClansEnabled, bc_clans_enabled, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable Clans menu page")
+MACRO_CONFIG_STR(BcClansApiUrl, bc_clans_api_url, 128, "https://clans.bestclient.fun", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Clans API base URL (allowlisted)")
+MACRO_CONFIG_INT(BcClansAllowLocalDev, bc_clans_allow_local_dev, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Allow localhost clans API for development")
+MACRO_CONFIG_INT(BcClansUnreadBadge, bc_clans_unread_badge, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show unread badge on Clans menubar button")

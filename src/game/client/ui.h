@@ -178,6 +178,9 @@ public:
 		ColorRGBA m_TextColor;
 		ColorRGBA m_TextOutlineColor;
 
+		// BestClient: invalidate streamed text when gradient-everything animation advances
+		int m_GradientPhaseBucket;
+
 		SUIElementRect();
 
 		ColorRGBA m_QuadColor;
@@ -555,6 +558,7 @@ public:
 	const void *HotItem() const { return m_pHotItem; }
 	const void *NextHotItem() const { return m_pBecomingHotItem; }
 	const void *ActiveItem() const { return m_pActiveItem; }
+	const void *LastActiveItem() const { return m_pLastActiveItem; }
 	const CScrollRegion *HotScrollRegion() const { return m_pHotScrollRegion; }
 
 	void StartCheck() { m_ActiveItemValid = false; }
@@ -622,7 +626,7 @@ public:
 	 *
 	 * @return true if the value of the input field changed since the last call.
 	 */
-	bool DoEditBox(CLineInput *pLineInput, const CUIRect *pRect, float FontSize, int Corners = IGraphics::CORNER_ALL, const std::vector<STextColorSplit> &vColorSplits = {});
+	bool DoEditBox(CLineInput *pLineInput, const CUIRect *pRect, float FontSize, int Corners = IGraphics::CORNER_ALL, const std::vector<STextColorSplit> &vColorSplits = {}, float LineWidth = -1.0f, float LineSpacing = 0.0f, const IButtonColorFunction *pColorFunction = nullptr, int Align = -1);
 
 	/**
 	 * Creates an input field with a clear [x] button attached to it.

@@ -204,6 +204,118 @@ void CMenus::RenderSettingsBestClientVisuals(CUIRect MainView)
 
 	CUIRect Content, Label, Button;
 
+	// Chat Bubbles (left column block)
+	const bool ChatBubblesExpanded = g_Config.m_BcChatBubbles != 0;
+	const bool ChatBubblesShowCustomColors = ChatBubblesExpanded && g_Config.m_BcChatBubbleCustomColors != 0;
+	const float ChatBubbleColorPickerLineSize = 25.0f;
+	const float ChatBubbleColorPickerSpacing = 5.0f;
+	static float s_ChatBubblesRevealPhase = 0.0f;
+	UpdateModuleRevealPhase(s_ChatBubblesRevealPhase, ChatBubblesExpanded, Client()->RenderFrameTime());
+	const float ChatBubblesExpandedTargetHeight =
+		9.0f * (MarginSmall + LineSize) +
+		(ChatBubblesShowCustomColors ? 3.0f * (ChatBubbleColorPickerSpacing + ChatBubbleColorPickerLineSize) : 0.0f);
+	const float ChatBubblesExpandedHeight = ChatBubblesExpandedTargetHeight * BCUiAnimations::EaseOutCubic(s_ChatBubblesRevealPhase);
+	const float ChatBubblesBlockHeight = LineSize + MarginSmall + LineSize + ChatBubblesExpandedHeight;
+
+	CUIRect ChatBubblesBlock;
+	Column.HSplitTop(ChatBubblesBlockHeight, &ChatBubblesBlock, &Column);
+
+	CUIRect ChatBubblesBlockBg = ChatBubblesBlock;
+	ChatBubblesBlockBg.w += BlockPadding;
+	ChatBubblesBlockBg.h += BlockPadding;
+	ChatBubblesBlockBg.x -= BlockPadding * 0.5f;
+	ChatBubblesBlockBg.y -= BlockPadding * 0.5f;
+	ChatBubblesBlockBg.Draw(BlockColor, IGraphics::CORNER_ALL, 10.0f);
+
+	MainView = ChatBubblesBlock;
+
+	MainView.HSplitTop(LineSize, &Label, &MainView);
+	CUIRect ChatBubblesTitleLabel, ChatBubblesResetButton;
+	Label.VSplitRight(LineSize + 8.0f, &ChatBubblesTitleLabel, &ChatBubblesResetButton);
+	static CButtonContainer s_ChatBubblesResetButton;
+	const bool ChatBubblesResetClicked = Ui()->DoButton_FontIcon(&s_ChatBubblesResetButton, FontIcon::ARROW_ROTATE_LEFT, 0, &ChatBubblesResetButton, BUTTONFLAG_LEFT);
+	GameClient()->m_Tooltips.DoToolTip(&s_ChatBubblesResetButton, &ChatBubblesResetButton, Localize("Reset to defaults"));
+	if(ChatBubblesResetClicked)
+	{
+		g_Config.m_BcChatBubbles = DefaultConfig::BcChatBubbles;
+		g_Config.m_BcChatBubblesSelf = DefaultConfig::BcChatBubblesSelf;
+		g_Config.m_BcChatBubblesDemo = DefaultConfig::BcChatBubblesDemo;
+		g_Config.m_BcChatBubbleSize = DefaultConfig::BcChatBubbleSize;
+		g_Config.m_BcChatBubbleShowTime = DefaultConfig::BcChatBubbleShowTime;
+		g_Config.m_BcChatBubbleFadeOut = DefaultConfig::BcChatBubbleFadeOut;
+		g_Config.m_BcChatBubbleFadeIn = DefaultConfig::BcChatBubbleFadeIn;
+		g_Config.m_BcChatBubbleAnimation = DefaultConfig::BcChatBubbleAnimation;
+		g_Config.m_BcChatBubbleCustomColors = DefaultConfig::BcChatBubbleCustomColors;
+		g_Config.m_BcChatBubbleBgColor = DefaultConfig::BcChatBubbleBgColor;
+		g_Config.m_BcChatBubbleTextColor = DefaultConfig::BcChatBubbleTextColor;
+		g_Config.m_BcChatBubbleOutlineColor = DefaultConfig::BcChatBubbleOutlineColor;
+		g_Config.m_BcChatBubbleRounding = DefaultConfig::BcChatBubbleRounding;
+	}
+	Ui()->DoLabel(&ChatBubblesTitleLabel, Localize("Chat Bubbles"), HeadlineFontSize, TEXTALIGN_ML);
+	MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+
+	MainView.HSplitTop(LineSize, &Content, &MainView);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcChatBubbles, Localize("Show chat bubbles above players"), &g_Config.m_BcChatBubbles, &Content, LineSize);
+
+	if(ChatBubblesExpandedHeight > 0.5f)
+	{
+		CUIRect Visible = MainView;
+		Visible.h = ChatBubblesExpandedHeight;
+		Ui()->ClipEnable(&Visible);
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Content, &MainView);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcChatBubblesSelf, Localize("Show chat bubbles above you"), &g_Config.m_BcChatBubblesSelf, &Content, LineSize);
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Content, &MainView);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcChatBubblesDemo, Localize("Show chat bubbles in demo"), &g_Config.m_BcChatBubblesDemo, &Content, LineSize);
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Button, &MainView);
+		Ui()->DoScrollbarOption(&g_Config.m_BcChatBubbleSize, &g_Config.m_BcChatBubbleSize, &Button, Localize("Chat bubble size"), 20, 30);
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Button, &MainView);
+		DoSliderWithScaledValue(&g_Config.m_BcChatBubbleShowTime, &g_Config.m_BcChatBubbleShowTime, &Button, Localize("Show for"), 200, 1000, 100, &CUi::ms_LinearScrollbarScale, CUi::SCROLLBAR_OPTION_NOCLAMPVALUE, "s");
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Button, &MainView);
+		DoSliderWithScaledValue(&g_Config.m_BcChatBubbleFadeIn, &g_Config.m_BcChatBubbleFadeIn, &Button, Localize("Fade in"), 15, 100, 100, &CUi::ms_LinearScrollbarScale, CUi::SCROLLBAR_OPTION_NOCLAMPVALUE, "s");
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Button, &MainView);
+		DoSliderWithScaledValue(&g_Config.m_BcChatBubbleFadeOut, &g_Config.m_BcChatBubbleFadeOut, &Button, Localize("Fade out"), 15, 100, 100, &CUi::ms_LinearScrollbarScale, CUi::SCROLLBAR_OPTION_NOCLAMPVALUE, "s");
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Content, &MainView);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcChatBubbleAnimation, Localize("Stack animation"), &g_Config.m_BcChatBubbleAnimation, &Content, LineSize);
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Button, &MainView);
+		Ui()->DoScrollbarOption(&g_Config.m_BcChatBubbleRounding, &g_Config.m_BcChatBubbleRounding, &Button, Localize("Corner rounding"), 0, 30);
+
+		MainView.HSplitTop(MarginSmall, nullptr, &MainView);
+		MainView.HSplitTop(LineSize, &Content, &MainView);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcChatBubbleCustomColors, Localize("Custom colors"), &g_Config.m_BcChatBubbleCustomColors, &Content, LineSize);
+
+		if(ChatBubblesShowCustomColors)
+		{
+			static CButtonContainer s_ChatBubbleBgColorButton;
+			DoLine_ColorPicker(&s_ChatBubbleBgColorButton, ChatBubbleColorPickerLineSize, 13.0f, ChatBubbleColorPickerSpacing, &MainView, Localize("Background"), &g_Config.m_BcChatBubbleBgColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::BcChatBubbleBgColor, true)), false, nullptr, true);
+
+			static CButtonContainer s_ChatBubbleTextColorButton;
+			DoLine_ColorPicker(&s_ChatBubbleTextColorButton, ChatBubbleColorPickerLineSize, 13.0f, ChatBubbleColorPickerSpacing, &MainView, Localize("Text"), &g_Config.m_BcChatBubbleTextColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::BcChatBubbleTextColor, true)), false, nullptr, true);
+
+			static CButtonContainer s_ChatBubbleOutlineColorButton;
+			DoLine_ColorPicker(&s_ChatBubbleOutlineColorButton, ChatBubbleColorPickerLineSize, 13.0f, ChatBubbleColorPickerSpacing, &MainView, Localize("Outline"), &g_Config.m_BcChatBubbleOutlineColor, color_cast<ColorRGBA>(ColorHSLA(DefaultConfig::BcChatBubbleOutlineColor, true)), false, nullptr, true);
+		}
+
+		Ui()->ClipDisable();
+	}
+
+	Column.HSplitTop(MarginBetweenViews, nullptr, &Column);
+
 	// Gradient (left column block)
 	const bool GradientNicknames = g_Config.m_BcNameplateGradient != 0;
 	const bool GradientClans = g_Config.m_BcNameplateGradientClan != 0;
@@ -2808,6 +2920,85 @@ void CMenus::RenderSettingsBestClientOthers(CUIRect MainView)
 	BrowserUtilsBlock.HSplitTop(MarginSmall, nullptr, &BrowserUtilsBlock);
 	BrowserUtilsBlock.HSplitTop(LineSize, &Content, &BrowserUtilsBlock);
 	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcUseShortKogServerName, Localize("Use short KoG server name"), &g_Config.m_BcUseShortKogServerName, &Content, LineSize);
+
+	// Chat Filter
+	Column.HSplitTop(MarginBetweenViews, nullptr, &Column);
+
+	const bool ChatFilterEnabled = g_Config.m_BcEnableCensorList != 0;
+	static float s_ChatFilterRevealPhase = 0.0f;
+	UpdateModuleRevealPhase(s_ChatFilterRevealPhase, ChatFilterEnabled, Client()->RenderFrameTime());
+
+	const float ChatFilterColorHeight = g_Config.m_BcShowBlockedWordInConsole ? LineSize + MarginSmall : 0.0f;
+	const float ChatFilterPartialHeight = g_Config.m_BcFilterChangeWholeWord == 2 ? MarginSmall + LineSize : 0.0f;
+	const float ChatFilterRadioHeight = 2.0f + LineSize;
+	const float ChatFilterExpandedTargetHeight = MarginSmall + 3.0f * (LineSize + MarginSmall) + ChatFilterColorHeight + LineSize + MarginSmall + ChatFilterRadioHeight + ChatFilterPartialHeight;
+	const float ChatFilterExpandedHeight = ChatFilterExpandedTargetHeight * BCUiAnimations::EaseOutCubic(s_ChatFilterRevealPhase);
+	const float ChatFilterHeaderHeight = LineSize + MarginSmall + LineSize;
+	const float ChatFilterBlockHeight = ChatFilterHeaderHeight + ChatFilterExpandedHeight;
+
+	CUIRect ChatFilterBlock;
+	Column.HSplitTop(ChatFilterBlockHeight, &ChatFilterBlock, &Column);
+
+	CUIRect ChatFilterBlockBg = ChatFilterBlock;
+	ChatFilterBlockBg.w += BlockPadding;
+	ChatFilterBlockBg.h += BlockPadding;
+	ChatFilterBlockBg.x -= BlockPadding * 0.5f;
+	ChatFilterBlockBg.y -= BlockPadding * 0.5f;
+	ChatFilterBlockBg.Draw(BlockColor, IGraphics::CORNER_ALL, 10.0f);
+
+	ChatFilterBlock.HSplitTop(LineSize, &Label, &ChatFilterBlock);
+	DrawBcMenuBadge(Graphics(), Ui(), TextRender(), &Label, Localize("NEW"), 12.0f,
+		ColorRGBA(0.25f, 0.85f, 0.40f, 1.0f), ColorRGBA(0.10f, 0.60f, 0.25f, 1.0f), MarginSmall);
+	Ui()->DoLabel(&Label, Localize("Chat Filter"), HeadlineFontSize, TEXTALIGN_ML);
+	ChatFilterBlock.HSplitTop(MarginSmall, nullptr, &ChatFilterBlock);
+
+	ChatFilterBlock.HSplitTop(LineSize, &Content, &ChatFilterBlock);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcEnableCensorList, Localize("Enable chat filter"), &g_Config.m_BcEnableCensorList, &Content, LineSize);
+	GameClient()->m_Tooltips.DoToolTip(&g_Config.m_BcEnableCensorList, &Content, Localize("Replacing blocked word with replacement char(badbad->******)"));
+
+	if(ChatFilterExpandedHeight > 0.5f)
+	{
+		CUIRect Visible = ChatFilterBlock;
+		Visible.h = ChatFilterExpandedHeight;
+		Ui()->ClipEnable(&Visible);
+
+		ChatFilterBlock.HSplitTop(MarginSmall, nullptr, &ChatFilterBlock);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcShowBlockedWordInConsole, Localize("Show blocked word in console"), &g_Config.m_BcShowBlockedWordInConsole, &ChatFilterBlock, LineSize);
+		GameClient()->m_Tooltips.DoToolTip(&g_Config.m_BcShowBlockedWordInConsole, &ChatFilterBlock, Localize("In console will be like 'tee said badbad'"));
+		ChatFilterBlock.HSplitTop(MarginSmall, nullptr, &ChatFilterBlock);
+		if(g_Config.m_BcShowBlockedWordInConsole)
+		{
+			static CButtonContainer s_BlockedWordConsoleColorButton;
+			DoLine_ColorPicker(&s_BlockedWordConsoleColorButton, LineSize, 13.0f, MarginSmall, &ChatFilterBlock, Localize("Blocked words console color"), &g_Config.m_BcBlockedWordConsoleColor, color_cast<ColorRGBA>(ColorHSLA(0x99ffff)), false, nullptr, false);
+		}
+
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_BcMultipleReplacementChar, Localize("Multiple replacement char on blocked word len"), &g_Config.m_BcMultipleReplacementChar, &ChatFilterBlock, LineSize);
+		GameClient()->m_Tooltips.DoToolTip(&g_Config.m_BcMultipleReplacementChar, &ChatFilterBlock, Localize("if no will be 'badbad->*' if yes 'badbad->******'"));
+		ChatFilterBlock.HSplitTop(MarginSmall, nullptr, &ChatFilterBlock);
+
+		static CLineInput s_ReplacementChar;
+		s_ReplacementChar.SetBuffer(g_Config.m_BcBlockedContentReplacementChar, sizeof(g_Config.m_BcBlockedContentReplacementChar));
+		ChatFilterBlock.HSplitTop(LineSize, &Label, &ChatFilterBlock);
+		DoEditBoxWithLabel(&s_ReplacementChar, &Label, Localize("Replacement char"), "*", g_Config.m_BcBlockedContentReplacementChar, sizeof(g_Config.m_BcBlockedContentReplacementChar));
+		ChatFilterBlock.HSplitTop(MarginSmall, nullptr, &ChatFilterBlock);
+
+		static std::vector<CButtonContainer> s_vChatFilterModeButtons = {{}, {}, {}};
+		DoLine_RadioMenu(ChatFilterBlock, Localize("Replace word with:", "ChatFilter"),
+			s_vChatFilterModeButtons,
+			{Localize("Regex", "ChatFilter"), Localize("Full", "ChatFilter"), Localize("Both", "ChatFilter")},
+			{0, 1, 2},
+			g_Config.m_BcFilterChangeWholeWord);
+		if(g_Config.m_BcFilterChangeWholeWord == 2)
+		{
+			ChatFilterBlock.HSplitTop(MarginSmall, nullptr, &ChatFilterBlock);
+			static CLineInput s_PartialReplacementChar;
+			s_PartialReplacementChar.SetBuffer(g_Config.m_BcBlockedContentPartialReplacementChar, sizeof(g_Config.m_BcBlockedContentPartialReplacementChar));
+			ChatFilterBlock.HSplitTop(LineSize, &Label, &ChatFilterBlock);
+			DoEditBoxWithLabel(&s_PartialReplacementChar, &Label, Localize("Partial Replacement char"), "*", g_Config.m_BcBlockedContentPartialReplacementChar, sizeof(g_Config.m_BcBlockedContentPartialReplacementChar));
+		}
+
+		Ui()->ClipDisable();
+	}
 
 	const bool VoiceExpanded = g_Config.m_BcVoiceChatEnable != 0;
 	static float s_VoiceRevealPhase = 0.0f;
