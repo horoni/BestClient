@@ -28,12 +28,12 @@ MACRO_CONFIG_INT(ShBalanceVMode, sh_balance_vmode, 0, 0, 2, CFGFLAG_CLIENT | CFG
 MACRO_CONFIG_INT(ShAim, sh_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Aimbot enable")
 MACRO_CONFIG_INT(ShAimSilent, sh_aim_silent, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Silent aimbot")
 MACRO_CONFIG_INT(ShAimForceFng, sh_aim_forcefng, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Force FNG Gamemode")
+MACRO_CONFIG_INT(ShAimEdgeScan, sh_aim_edgescan, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Aimbot EdgeScan")
+MACRO_CONFIG_INT(ShAimEdgeScanAccuracy, sh_aim_edgescan_accuracy, 1, 1, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "EdgeScan Accuracy")
 
 // <> Hook <>
 MACRO_CONFIG_INT(ShAimHook, sh_aim_hook, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hook Aimbot Enable")
 MACRO_CONFIG_INT(ShAimHookFov, sh_aim_hook_fov, 1, 1, 360, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hook Aimbot FOV")
-MACRO_CONFIG_INT(ShAimHookEdge, sh_aim_hook_edge, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hook Aimbot Edge")
-MACRO_CONFIG_INT(ShAimHookEdgeAccuracy, sh_aim_hook_edge_accuracy, 0, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Edge accuracy")
 
 // <> Hammer <>
 MACRO_CONFIG_INT(ShAimHammer, sh_aim_hammer, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hammer Aimbot Enable")

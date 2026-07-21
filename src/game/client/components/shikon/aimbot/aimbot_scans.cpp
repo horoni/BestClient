@@ -27,7 +27,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 		return PredTargetPos - MyPos;
 
 	// If hitpoint scan is disabled and normal scan failed, return
-	if(!g_Config.m_ShAimHookEdge || (Weapon != EWeapon::Hook && Weapon != EWeapon::Laser))
+	if(!g_Config.m_ShAimEdgeScan || (Weapon != EWeapon::Hook && Weapon != EWeapon::Laser))
 		return std::nullopt;
 
 	/* Gets the angle we should be able to hook
@@ -43,7 +43,7 @@ std::optional<vec2> CSHAimbot::EdgeScan(EWeapon Weapon, vec2 MyPos, vec2 MyVel, 
 	*/
 	const float Radius = (Weapon == EWeapon::Hook) ? GetPhysSize() + 2.0f : GetPhysSize() * 0.5f;
 	const float VisibleAngle = atan2(PredTargetPos.y - MyPos.y, PredTargetPos.x - MyPos.x) + pi * 0.5f;
-	for(float i = VisibleAngle; i < 2.f * pi + VisibleAngle; i += 1.f / g_Config.m_ShAimHookEdgeAccuracy)
+	for(float i = VisibleAngle; i < 2.f * pi + VisibleAngle; i += 1.f / g_Config.m_ShAimEdgeScanAccuracy)
 	{
 		// Return if we have enough hitpoints
 		if(HitPointsCount >= MAX_HITPOINTS)

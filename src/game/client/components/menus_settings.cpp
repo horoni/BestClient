@@ -3261,9 +3261,9 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	} else
 		Column.HSplitTop(LineSize * 2, nullptr, &Column);
 
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimHookEdge, ("Edge Scan"), &g_Config.m_ShAimHookEdge, &Column, LineSize);
+	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimEdgeScan, ("EdgeScan"), &g_Config.m_ShAimEdgeScan, &Column, LineSize);
 	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_ShAimHookEdgeAccuracy, &g_Config.m_ShAimHookEdgeAccuracy, &Button, ("Accuracy"), 1, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
+	Ui()->DoScrollbarOption(&g_Config.m_ShAimEdgeScanAccuracy, &g_Config.m_ShAimEdgeScanAccuracy, &Button, ("Accuracy"), 1, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
 
 	if (g_Config.m_ShAim)
 	{
