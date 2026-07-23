@@ -3270,12 +3270,11 @@ void CMenus::RenderSettingsShikon(CUIRect MainView)
 	if (g_Config.m_ShAim) {
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimSilent, ("Silent"), &g_Config.m_ShAimSilent, &Column, LineSize);
 		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimForceFng, ("Force FNG mode"), &g_Config.m_ShAimForceFng, &Column, LineSize);
+		DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimEdgeScan, ("EdgeScan"), &g_Config.m_ShAimEdgeScan, &Column, LineSize);
+		Column.HSplitTop(LineSize, &Button, &Column);
+		Ui()->DoScrollbarOption(&g_Config.m_ShAimEdgeScanAccuracy, &g_Config.m_ShAimEdgeScanAccuracy, &Button, ("Accuracy"), 1, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
 	} else
-		Column.HSplitTop(LineSize * 2, nullptr, &Column);
-
-	DoButton_CheckBoxAutoVMarginAndSet(&g_Config.m_ShAimEdgeScan, ("EdgeScan"), &g_Config.m_ShAimEdgeScan, &Column, LineSize);
-	Column.HSplitTop(LineSize, &Button, &Column);
-	Ui()->DoScrollbarOption(&g_Config.m_ShAimEdgeScanAccuracy, &g_Config.m_ShAimEdgeScanAccuracy, &Button, ("Accuracy"), 1, 100, &CUi::ms_LinearScrollbarScale, 0u, "");
+		Column.HSplitTop(LineSize * 4, nullptr, &Column);
 
 	if (g_Config.m_ShAim)
 	{
