@@ -124,6 +124,18 @@ private:
 		bool m_Finished = false;
 	};
 
+	struct SControlState
+	{
+		CNetObj_PlayerInput m_Input{};
+		int m_InputDirectionLeft = 0;
+		int m_InputDirectionRight = 0;
+		int m_SnapTapAppliedDirection = 0;
+		int m_SnapTapLastPressedDirection = 0;
+		int64_t m_SnapTapLastPressedTime = 0;
+		int m_SnapTapPrevLeft = 0;
+		int m_SnapTapPrevRight = 0;
+	};
+
 	bool m_Enabled = false;
 	bool m_Ready = false;
 	bool m_NeedsRebuild = false;
@@ -157,6 +169,11 @@ private:
 	std::array<CCharacterCore, MAX_CLIENTS> m_aPublishedPrevPredicted{};
 	std::array<CCharacterCore, MAX_CLIENTS> m_aPublishedRegularPredicted{};
 	std::array<bool, MAX_CLIENTS> m_aPublishedValid{};
+	std::array<CNetObj_PlayerInput, NUM_DUMMIES> m_aServerLockedInputs{};
+	std::array<SControlState, NUM_DUMMIES> m_aStoredControlState{};
+	CNetObj_PlayerInput m_StoredDummyInput{};
+	int m_StoredDummyFire = 0;
+	bool m_HasStoredControlState = false;
 
 	SGhostData m_MainGhost;
 	SGhostData m_DummyGhost;
@@ -181,7 +198,7 @@ private:
 	void UpdateGhostData();
 	void UpdateGhostForClientId(int ClientId, SGhostData &Ghost);
 	void CaptureAnchorsFromSnapshot();
-	bool ApplyAnchorToCharacter(CGameWorld &World, const SAnchorData &Anchor) const;
+	bool ApplyAnchorToCharacter(CGameWorld &World, const SAnchorData &Anchor, int InputConn) const;
 	bool Rebuild();
 	void PrunePracticeWorld(CGameWorld &World) const;
 	void ResetAttackTickHistory();
@@ -210,6 +227,8 @@ private:
 	void ResetCharacterToSaved(int ClientId, CCharacter *pChar, int Tick);
 	void PlayCoreEvents(CCharacter *pChar, int Tick);
 	void PublishParticipantCores(int LocalClientId, int DummyClientId);
+	void RebaseBufferedFireState();
+	void RestoreControlState();
 
 	[[gnu::format(printf, 2, 3)]]
 	void EchoPractice(const char *pFormat, ...) const;
